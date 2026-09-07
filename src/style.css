@@ -1,0 +1,49 @@
+:root {
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1f2937;
+  background: #f3f4f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.95),
+      transparent 42%
+    ),
+    linear-gradient(180deg, #f8fafc 0%, #e5e7eb 100%);
+}
+
+a {
+  color: inherit;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.page-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.page-shell h1 {
+  margin-top: 0;
+}

@@ -2,8 +2,10 @@ import { ticTacToe } from "./pages/tictactoe";
 import { apiPage } from "./pages/apiPage";
 import { homePage } from "./pages/home";
 import { notFoundPage } from "./pages/notFound";
+import { renderNavbar } from "./components/nevbar/nevbar";
 
 export const renderPage = (route: string) => {
+  const page = (() => {
   switch (route) {
     case "/":
       return homePage();
@@ -14,6 +16,14 @@ export const renderPage = (route: string) => {
     default:
       return notFoundPage(route);
   }
+  })();
+
+  return `
+    ${renderNavbar()}
+    <main class="page-shell">
+      ${page}
+    </main>
+  `;
 };
 const app = document.querySelector<HTMLDivElement>("#app");
 
