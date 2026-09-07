@@ -1,0 +1,28 @@
+.ttt-field {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size, 3), minmax(70px, 1fr));
+  gap: 0.5rem;
+  width: min(420px, 100%);
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.ttt-field__cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dfe7ff;
+  border-radius: 0.75rem;
+  background: #f8faff;
+  color: #1f2937;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  user-select: none;
+}
+
+.ttt-field__cell:empty {
+  color: transparent;
+}
