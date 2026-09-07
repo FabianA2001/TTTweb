@@ -1,4 +1,5 @@
 import { ticTacToe } from "./pages/tictactoe";
+import { apiPage } from "./pages/apiPage";
 import { homePage } from "./pages/home";
 import { notFoundPage } from "./pages/notFound";
 
@@ -8,6 +9,8 @@ export const renderPage = (route: string) => {
       return homePage();
     case "/tictactoe":
       return ticTacToe();
+    case "/api":
+      return apiPage();
     default:
       return notFoundPage(route);
   }
