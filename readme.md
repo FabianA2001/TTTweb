@@ -4,3 +4,4 @@
 
 - TODO
   - Wie lade ich nur den Betroffenen Teil der Seite neu
+  - Board andere größe als 3, aktuell hängt es sich nur auf
