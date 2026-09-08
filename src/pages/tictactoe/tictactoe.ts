@@ -1,11 +1,46 @@
-import { renderTicTacToeField } from "../components/tttField/tttField";
-import { Game, GameState } from "../gameLogic/game";
-import type { Page } from "./page.ts";
+import { renderTicTacToeField } from "../../components/tttField/tttField";
+import { GameState } from "../../gameLogic/game";
+import { OnePlayerGame } from "../../gameLogic/onePlayerGame";
+import { TwoPlayerGame } from "../../gameLogic/twoPlayerGame";
+import type { Page } from "../page.ts";
+import "./tictactoe.css";
 
 let refreshPage: (() => void) | null = null;
 let gameState: GameState = GameState.InProgress;
 let isTicTacToeBound = false;
-let game = new Game(3);
+let game = new TwoPlayerGame(3);
+
+enum GameMode {
+  OnePlayer = "one-player",
+  TwoPlayer = "two-player",
+}
+
+function startGame(mode: GameMode): void {
+  gameState = GameState.InProgress;
+  game =
+    mode === GameMode.OnePlayer ? new OnePlayerGame(3) : new TwoPlayerGame(3);
+  refreshPage?.();
+}
+
+function handleOnePlayerButtonClick(): void {
+  startGame(GameMode.OnePlayer);
+}
+
+function handleTwoPlayerButtonClick(): void {
+  startGame(GameMode.TwoPlayer);
+}
+
+function bindGameModeButtons(root: HTMLElement): void {
+  const onePlayerButton = root.querySelector<HTMLButtonElement>(
+    'button[data-game-mode="one-player"]',
+  );
+  const twoPlayerButton = root.querySelector<HTMLButtonElement>(
+    'button[data-game-mode="two-player"]',
+  );
+
+  onePlayerButton?.addEventListener("click", handleOnePlayerButtonClick);
+  twoPlayerButton?.addEventListener("click", handleTwoPlayerButtonClick);
+}
 
 function mouseEventToRowAndColumn(
   event: MouseEvent,
@@ -49,16 +84,17 @@ function handleTicTacToeClick(event: MouseEvent) {
   const [row, column] = coords;
   gameState = game.gameturn(row, column);
   refreshPage?.();
-  if (gameState === GameState.Draw) {
-    alert("Unentschieden!");
-  }
 }
 
 export const ticTacToe: Page = {
   render: () => {
     return `
-      <section>
+      <section class="tic-tac-toe-page">
         <h1>Tic Tac Toe</h1>
+        <div class="game-mode-actions">
+          <button type="button" data-game-mode="one-player">1 Spieler</button>
+          <button type="button" data-game-mode="two-player">2 Spieler</button>
+        </div>
         <p>Klicke auf ein Feld, um den State zu ändern und die Seite neu zu rendern.</p>
         ${renderTicTacToeField(game.getBoard())}
       </section>
@@ -67,6 +103,7 @@ export const ticTacToe: Page = {
   mount: ({ root, refresh }) => {
     console.log("Mounting Tic Tac Toe page");
     refreshPage = refresh;
+    bindGameModeButtons(root);
     if (isTicTacToeBound) {
       return;
     }

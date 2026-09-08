@@ -1,4 +1,4 @@
-import { ticTacToe } from "./pages/tictactoe";
+import { ticTacToe } from "./pages/tictactoe/tictactoe";
 import { apiPage } from "./pages/apiPage";
 import { homePage } from "./pages/home";
 import { notFoundPage } from "./pages/notFound";
