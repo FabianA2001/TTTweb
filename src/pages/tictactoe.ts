@@ -1,8 +1,9 @@
 import { renderTicTacToeField } from "../components/tttField/tttField";
-import { Game } from "../gameLogic/game";
+import { Game, GameState } from "../gameLogic/game";
 import type { Page } from "./page.ts";
 
 let refreshPage: (() => void) | null = null;
+let gameState: GameState = GameState.InProgress;
 let isTicTacToeBound = false;
 let game = new Game(3);
 
@@ -39,11 +40,18 @@ function mouseEventToRowAndColumn(
 }
 
 function handleTicTacToeClick(event: MouseEvent) {
+  if (gameState !== GameState.InProgress) {
+    alert("Das Spiel ist vorbei. Bitte starte ein neues Spiel.");
+    return;
+  }
   const coords = mouseEventToRowAndColumn(event);
   if (!coords) return;
   const [row, column] = coords;
-  game.makeMove(row, column);
+  gameState = game.gameturn(row, column);
   refreshPage?.();
+  if (gameState === GameState.Draw) {
+    alert("Unentschieden!");
+  }
 }
 
 export const ticTacToe: Page = {
@@ -57,12 +65,11 @@ export const ticTacToe: Page = {
     `;
   },
   mount: ({ root, refresh }) => {
+    console.log("Mounting Tic Tac Toe page");
     refreshPage = refresh;
-
     if (isTicTacToeBound) {
       return;
     }
-
     isTicTacToeBound = true;
     root.addEventListener("click", handleTicTacToeClick);
   },

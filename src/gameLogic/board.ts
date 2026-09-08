@@ -7,6 +7,7 @@ export enum CellState {
 export class Board {
   private readonly size: number;
   private readonly cells: CellState[];
+  private readonly marks: boolean[];
 
   constructor(size: number, startValue: CellState = CellState.Empty) {
     if (!Number.isInteger(size) || size <= 0) {
@@ -15,6 +16,7 @@ export class Board {
 
     this.size = size;
     this.cells = Array.from({ length: size * size }, () => startValue);
+    this.marks = Array.from({ length: size * size }, () => false);
   }
 
   getSize(): number {
@@ -23,6 +25,10 @@ export class Board {
 
   getBoard(): CellState[] {
     return [...this.cells];
+  }
+
+  getMarks(): boolean[] {
+    return [...this.marks];
   }
 
   getCell(row: number, column: number): CellState {
@@ -58,10 +64,13 @@ export class Board {
     }
 
     this.cells.splice(0, this.cells.length, ...values);
+    // Reset marks when the whole board is replaced
+    this.marks.fill(false);
   }
 
   clear(): void {
     this.cells.fill(CellState.Empty);
+    this.marks.fill(false);
   }
 
   private getIndex(row: number, column: number): number {
@@ -69,6 +78,28 @@ export class Board {
     this.assertInRange(column, "column");
 
     return row * this.size + column;
+  }
+
+  isMarked(row: number, column: number): boolean {
+    this.assertInRange(row, "row");
+    this.assertInRange(column, "column");
+
+    return this.marks[this.getIndex(row, column)];
+  }
+
+  setMark(row: number, column: number, value: boolean): void {
+    this.assertInRange(row, "row");
+    this.assertInRange(column, "column");
+
+    this.marks[this.getIndex(row, column)] = Boolean(value);
+  }
+
+  toggleMark(row: number, column: number): void {
+    this.assertInRange(row, "row");
+    this.assertInRange(column, "column");
+
+    const idx = this.getIndex(row, column);
+    this.marks[idx] = !this.marks[idx];
   }
 
   private assertInRange(value: number, name: string): void {

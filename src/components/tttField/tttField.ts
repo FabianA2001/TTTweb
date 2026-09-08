@@ -22,13 +22,15 @@ export function renderTicTacToeField(board: Board): string {
           const row = Math.floor(index / size);
           const column = index % size;
           const value = symbolMap[cell];
+          const marked = board.isMarked(row, column);
 
           return `
             <button
               type="button"
-              class="ttt-field__cell"
+              class="ttt-field__cell${marked ? " ttt-field__cell--marked" : ""}"
               data-cell-index="${index}"
-              aria-label="Row ${row + 1}, Column ${column + 1}${value ? `, ${value}` : ", empty"}"
+              data-marked="${marked}"
+              aria-label="Row ${row + 1}, Column ${column + 1}${value ? `, ${value}` : ", empty"}${marked ? ", marked" : ""}"
             >
               ${value}
             </button>

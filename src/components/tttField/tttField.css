@@ -38,3 +38,8 @@
 .ttt-field__cell:empty {
   color: transparent;
 }
+
+.ttt-field__cell--marked {
+  background: linear-gradient(135deg, #fff7cc, #fff1b8);
+  border-color: #fde68a;
+}
