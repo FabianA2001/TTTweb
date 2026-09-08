@@ -4,6 +4,11 @@ export enum CellState {
   Circle = "Kreis",
 }
 
+export type WinnerInfo = {
+  winner: CellState.Cross | CellState.Circle;
+  cells: Array<[number, number]>;
+};
+
 export class Board {
   private readonly size: number;
   private readonly cells: CellState[];
@@ -25,6 +30,92 @@ export class Board {
 
   getBoard(): CellState[] {
     return [...this.cells];
+  }
+
+  getWinner(): WinnerInfo | null {
+    const size = this.size;
+
+    for (let row = 0; row < size; row++) {
+      const rowValues = this.getRow(row);
+
+      if (rowValues.every((cell) => cell === CellState.Cross)) {
+        return {
+          winner: CellState.Cross,
+          cells: Array.from({ length: size }, (_, column) => [row, column]),
+        };
+      }
+
+      if (rowValues.every((cell) => cell === CellState.Circle)) {
+        return {
+          winner: CellState.Circle,
+          cells: Array.from({ length: size }, (_, column) => [row, column]),
+        };
+      }
+    }
+
+    for (let column = 0; column < size; column++) {
+      const columnValues = this.getColumn(column);
+
+      if (columnValues.every((cell) => cell === CellState.Cross)) {
+        return {
+          winner: CellState.Cross,
+          cells: Array.from({ length: size }, (_, row) => [row, column]),
+        };
+      }
+
+      if (columnValues.every((cell) => cell === CellState.Circle)) {
+        return {
+          winner: CellState.Circle,
+          cells: Array.from({ length: size }, (_, row) => [row, column]),
+        };
+      }
+    }
+
+    const firstDiagonal = Array.from(
+      { length: size },
+      (_, index) => [index, index] as [number, number],
+    );
+    const secondDiagonal = Array.from(
+      { length: size },
+      (_, index) => [index, size - 1 - index] as [number, number],
+    );
+
+    const firstDiagonalValues = firstDiagonal.map(([row, column]) =>
+      this.getCell(row, column),
+    );
+    const secondDiagonalValues = secondDiagonal.map(([row, column]) =>
+      this.getCell(row, column),
+    );
+
+    if (firstDiagonalValues.every((cell) => cell === CellState.Cross)) {
+      return {
+        winner: CellState.Cross,
+        cells: firstDiagonal,
+      };
+    }
+
+    if (firstDiagonalValues.every((cell) => cell === CellState.Circle)) {
+      return {
+        winner: CellState.Circle,
+        cells: firstDiagonal,
+      };
+    }
+
+    if (secondDiagonalValues.every((cell) => cell === CellState.Cross)) {
+      return {
+        winner: CellState.Cross,
+        cells: secondDiagonal,
+      };
+    }
+
+    if (secondDiagonalValues.every((cell) => cell === CellState.Circle)) {
+      return {
+        winner: CellState.Circle,
+        cells: secondDiagonal,
+      };
+    }
+
+    return null;
   }
 
   getMarks(): boolean[] {

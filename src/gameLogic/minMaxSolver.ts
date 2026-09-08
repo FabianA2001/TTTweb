@@ -6,62 +6,6 @@ type Move = {
   column: number;
 };
 
-function getWinner(board: Board): CellState | null {
-  const size = board.getSize();
-
-  for (let row = 0; row < size; row++) {
-    const rowValues = board.getRow(row);
-    if (rowValues.every((cell) => cell === CellState.Cross)) {
-      return CellState.Cross;
-    }
-    if (rowValues.every((cell) => cell === CellState.Circle)) {
-      return CellState.Circle;
-    }
-  }
-
-  for (let column = 0; column < size; column++) {
-    const columnValues = board.getColumn(column);
-    if (columnValues.every((cell) => cell === CellState.Cross)) {
-      return CellState.Cross;
-    }
-    if (columnValues.every((cell) => cell === CellState.Circle)) {
-      return CellState.Circle;
-    }
-  }
-
-  let diagonalOneCross = true;
-  let diagonalOneCircle = true;
-  let diagonalTwoCross = true;
-  let diagonalTwoCircle = true;
-
-  for (let index = 0; index < size; index++) {
-    const firstDiagonalCell = board.getCell(index, index);
-    const secondDiagonalCell = board.getCell(index, size - 1 - index);
-
-    if (firstDiagonalCell !== CellState.Cross) {
-      diagonalOneCross = false;
-    }
-    if (firstDiagonalCell !== CellState.Circle) {
-      diagonalOneCircle = false;
-    }
-    if (secondDiagonalCell !== CellState.Cross) {
-      diagonalTwoCross = false;
-    }
-    if (secondDiagonalCell !== CellState.Circle) {
-      diagonalTwoCircle = false;
-    }
-  }
-
-  if (diagonalOneCross || diagonalTwoCross) {
-    return CellState.Cross;
-  }
-  if (diagonalOneCircle || diagonalTwoCircle) {
-    return CellState.Circle;
-  }
-
-  return null;
-}
-
 function isBoardFull(board: Board): boolean {
   return board.getBoard().every((cell) => cell !== CellState.Empty);
 }
@@ -70,7 +14,7 @@ function evaluateTerminal(
   board: Board,
   maximizingPlayer: CellState,
 ): number | null {
-  const winner = getWinner(board);
+  const winner = board.getWinner()?.winner ?? null;
 
   if (winner === maximizingPlayer) {
     return 10;

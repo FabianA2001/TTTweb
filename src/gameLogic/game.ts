@@ -54,72 +54,23 @@ export class Game {
   }
 
   checkWinnerAndMark(): GameState {
-    const size = this.board.getSize();
+    const winner = this.board.getWinner();
 
-    // Clear previous marks
-    for (let r = 0; r < size; r++) {
-      for (let c = 0; c < size; c++) {
-        this.board.setMark(r, c, false);
+    for (let row = 0; row < this.board.getSize(); row++) {
+      for (let column = 0; column < this.board.getSize(); column++) {
+        this.board.setMark(row, column, false);
       }
     }
-
-    // Check rows
-    for (let r = 0; r < size; r++) {
-      const row = this.board.getRow(r);
-      if (row.every((cell) => cell === CellState.Cross)) {
-        for (let c = 0; c < size; c++) this.board.setMark(r, c, true);
-        return GameState.CrossWins;
-      }
-      if (row.every((cell) => cell === CellState.Circle)) {
-        for (let c = 0; c < size; c++) this.board.setMark(r, c, true);
-        return GameState.CircleWins;
-      }
+    if (!winner) {
+      return GameState.InProgress;
+    }
+    for (const [row, column] of winner.cells) {
+      this.board.setMark(row, column, true);
     }
 
-    // Check columns
-    for (let c = 0; c < size; c++) {
-      const col = this.board.getColumn(c);
-      if (col.every((cell) => cell === CellState.Cross)) {
-        for (let r = 0; r < size; r++) this.board.setMark(r, c, true);
-        return GameState.CrossWins;
-      }
-      if (col.every((cell) => cell === CellState.Circle)) {
-        for (let r = 0; r < size; r++) this.board.setMark(r, c, true);
-        return GameState.CircleWins;
-      }
-    }
-
-    // Check diagonals
-    let diag1AllCross = true;
-    let diag1AllCircle = true;
-    let diag2AllCross = true;
-    let diag2AllCircle = true;
-    for (let i = 0; i < size; i++) {
-      const d1 = this.board.getCell(i, i);
-      const d2 = this.board.getCell(i, size - 1 - i);
-      if (d1 !== CellState.Cross) diag1AllCross = false;
-      if (d1 !== CellState.Circle) diag1AllCircle = false;
-      if (d2 !== CellState.Cross) diag2AllCross = false;
-      if (d2 !== CellState.Circle) diag2AllCircle = false;
-    }
-    if (diag1AllCross) {
-      for (let i = 0; i < size; i++) this.board.setMark(i, i, true);
-      return GameState.CrossWins;
-    }
-    if (diag1AllCircle) {
-      for (let i = 0; i < size; i++) this.board.setMark(i, i, true);
-      return GameState.CircleWins;
-    }
-    if (diag2AllCross) {
-      for (let i = 0; i < size; i++) this.board.setMark(i, size - 1 - i, true);
-      return GameState.CrossWins;
-    }
-    if (diag2AllCircle) {
-      for (let i = 0; i < size; i++) this.board.setMark(i, size - 1 - i, true);
-      return GameState.CircleWins;
-    }
-
-    return GameState.InProgress; // No winner yet
+    return winner.winner === CellState.Cross
+      ? GameState.CrossWins
+      : GameState.CircleWins;
   }
 
   private switchPlayer(): void {
