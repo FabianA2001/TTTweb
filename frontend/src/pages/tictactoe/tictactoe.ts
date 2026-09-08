@@ -1,7 +1,5 @@
-import { renderTicTacToeField } from "../../components/tttField/tttField";
-import { GameState } from "../../gameLogic/game";
-import { OnePlayerGame } from "../../gameLogic/onePlayerGame";
-import { TwoPlayerGame } from "../../gameLogic/twoPlayerGame";
+import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
+import { GameState, OnePlayerGame, TwoPlayerGame } from "@tttweb/shared";
 import type { Page } from "../page.ts";
 import "./tictactoe.css";
 

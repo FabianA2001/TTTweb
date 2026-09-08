@@ -1,8 +1,8 @@
-import { ticTacToe } from "./pages/tictactoe/tictactoe";
-import { apiPage } from "./pages/apiPage";
-import { homePage } from "./pages/home";
-import { notFoundPage } from "./pages/notFound";
-import { renderNavbar } from "./components/nevbar/nevbar";
+import { ticTacToe } from "./pages/tictactoe/tictactoe.ts";
+import { apiPage } from "./pages/apiPage.ts";
+import { homePage } from "./pages/home.ts";
+import { notFoundPage } from "./pages/notFound.ts";
+import { renderNavbar } from "./components/nevbar/nevbar.ts";
 import type { Page, PageContext } from "./pages/page.ts";
 
 const pages: Record<string, Page> = {

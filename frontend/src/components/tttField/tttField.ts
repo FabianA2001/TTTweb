@@ -1,5 +1,5 @@
 import "./tttField.css";
-import { Board, CellState } from "../../gameLogic/board";
+import { Board, CellState } from "../../../../shared/src/gameLogic/board";
 
 const symbolMap: Record<CellState, string> = {
   [CellState.Empty]: "",

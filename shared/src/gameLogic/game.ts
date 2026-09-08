@@ -1,4 +1,4 @@
-import { Board, CellState } from "../gameLogic/board";
+import { Board, CellState } from "./board";
 
 export enum GameState {
   InProgress,

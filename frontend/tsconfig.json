@@ -6,6 +6,12 @@
     "types": ["vite/client"],
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@tttweb/shared": ["../shared/src/index.ts"],
+      "@tttweb/shared/*": ["../shared/src/*"]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
