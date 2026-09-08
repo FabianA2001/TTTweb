@@ -10,26 +10,29 @@ const pages: Record<string, Page> = {
   "/tictactoe": ticTacToe,
   "/api": apiPage,
 };
-const getCurrentPage = (route: string): Page => {
+function getCurrentPage(route: string): Page {
   return pages[route] ?? notFoundPage;
-};
+}
 
-const getApp = (): HTMLDivElement => {
+function getApp(): HTMLDivElement {
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) {
     throw new Error("App container not found");
   }
   return app;
-};
+}
 
-const getCurrentRoute = (): string => normalizeHash(window.location.hash);
-const normalizeHash = (hash: string) => {
+function getCurrentRoute(): string {
+  return normalizeHash(window.location.hash);
+}
+
+function normalizeHash(hash: string) {
   const value = hash.replace(/^#/, "").trim();
 
   return value === "" ? "/" : value.startsWith("/") ? value : `/${value}`;
-};
+}
 
-const updateActiveLinks = () => {
+function updateActiveLinks() {
   const links =
     getApp().querySelectorAll<HTMLAnchorElement>("[data-route-link]");
 
@@ -42,9 +45,9 @@ const updateActiveLinks = () => {
       link.removeAttribute("aria-current");
     }
   });
-};
+}
 
-export const renderPage = () => {
+export function renderPage() {
   const currentRoute = getCurrentRoute();
   const page = getCurrentPage(currentRoute);
   const context: PageContext = {
@@ -62,9 +65,9 @@ export const renderPage = () => {
   updateActiveLinks();
 
   page.mount?.(context);
-};
+}
 
-export const startRouter = () => {
+export function startRouter() {
   window.addEventListener("hashchange", renderPage);
 
   if (!window.location.hash) {
@@ -73,4 +76,4 @@ export const startRouter = () => {
   }
 
   renderPage();
-};
+}

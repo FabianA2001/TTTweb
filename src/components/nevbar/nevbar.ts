@@ -1,6 +1,7 @@
 import "./nevbar.css";
 
-export const renderNavbar = (): string => `
+export function renderNavbar(): string {
+  return `
 	<header class="navbar">
 		<div class="navbar__inner">
 			<a class="navbar__link" href="#/" data-route-link>Home</a>
@@ -10,4 +11,5 @@ export const renderNavbar = (): string => `
 			</nav>
 		</div>
 	</header>
-`;
+  `;
+}

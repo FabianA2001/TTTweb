@@ -1,29 +1,13 @@
-import { Board, CellState } from "../gameLogic/board";
 import { renderTicTacToeField } from "../components/tttField/tttField";
+import { Game } from "../gameLogic/game";
 import type { Page } from "./page.ts";
 
-const board = new Board(3);
 let refreshPage: (() => void) | null = null;
 let isTicTacToeBound = false;
+let game = new Game(3);
 
-board.setCell(0, 0, CellState.Cross);
-board.setCell(0, 1, CellState.Circle);
-board.setCell(1, 1, CellState.Cross);
-
-//TODO Gamelogic auslagern
-const getNextCellState = (currentState: CellState): CellState => {
-  switch (currentState) {
-    case CellState.Empty:
-      return CellState.Cross;
-    case CellState.Cross:
-      return CellState.Circle;
-    case CellState.Circle:
-      return CellState.Empty;
-  }
-};
-
-export const handleTicTacToeCellClick = (cellIndex: number) => {
-  const size = board.getSize();
+function cellIndexToRowAndColumn(cellIndex: number) {
+  const size = game.getSize();
   const cellCount = size * size;
 
   if (!Number.isInteger(cellIndex) || cellIndex < 0 || cellIndex >= cellCount) {
@@ -32,12 +16,10 @@ export const handleTicTacToeCellClick = (cellIndex: number) => {
 
   const row = Math.floor(cellIndex / size);
   const column = cellIndex % size;
-  const nextState = getNextCellState(board.getCell(row, column));
+  return [row, column];
+}
 
-  board.setCell(row, column, nextState);
-};
-
-const handleTicTacToeClick = (event: MouseEvent) => {
+function handleTicTacToeClick(event: MouseEvent) {
   const target = event.target;
 
   if (!(target instanceof Element)) {
@@ -55,10 +37,12 @@ const handleTicTacToeClick = (event: MouseEvent) => {
   if (!Number.isInteger(cellIndex)) {
     return;
   }
-
-  handleTicTacToeCellClick(cellIndex);
+  const coords = cellIndexToRowAndColumn(cellIndex);
+  if (!coords) return;
+  const [row, column] = coords;
+  game.makeMove(row, column);
   refreshPage?.();
-};
+}
 
 export const ticTacToe: Page = {
   render: () => {
@@ -66,7 +50,7 @@ export const ticTacToe: Page = {
       <section>
         <h1>Tic Tac Toe</h1>
         <p>Klicke auf ein Feld, um den State zu ändern und die Seite neu zu rendern.</p>
-        ${renderTicTacToeField(board)}
+        ${renderTicTacToeField(game.getBoard())}
       </section>
     `;
   },

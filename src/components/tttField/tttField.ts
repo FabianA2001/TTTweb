@@ -7,7 +7,7 @@ const symbolMap: Record<CellState, string> = {
   [CellState.Circle]: "O",
 };
 
-export const renderTicTacToeField = (board: Board): string => {
+export function renderTicTacToeField(board: Board): string {
   if (!(board instanceof Board)) {
     throw new Error("renderTicTacToeField expects an instance of Board.");
   }
@@ -37,4 +37,4 @@ export const renderTicTacToeField = (board: Board): string => {
         .join("")}
     </div>
   `;
-};
+}
