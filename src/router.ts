@@ -3,50 +3,38 @@ import { apiPage } from "./pages/apiPage";
 import { homePage } from "./pages/home";
 import { notFoundPage } from "./pages/notFound";
 import { renderNavbar } from "./components/nevbar/nevbar";
+import type { Page, PageContext } from "./pages/page.ts";
 
-export const renderPage = (route: string) => {
-  const page = (() => {
-  switch (route) {
-    case "/":
-      return homePage();
-    case "/tictactoe":
-      return ticTacToe();
-    case "/api":
-      return apiPage();
-    default:
-      return notFoundPage(route);
-  }
-  })();
-
-  return `
-    ${renderNavbar()}
-    <main class="page-shell">
-      ${page}
-    </main>
-  `;
+const pages: Record<string, Page> = {
+  "/": homePage,
+  "/tictactoe": ticTacToe,
+  "/api": apiPage,
 };
-const app = document.querySelector<HTMLDivElement>("#app");
+const getCurrentPage = (route: string): Page => {
+  return pages[route] ?? notFoundPage;
+};
 
-if (!app) {
-  throw new Error("App container not found");
-}
+const getApp = (): HTMLDivElement => {
+  const app = document.querySelector<HTMLDivElement>("#app");
+  if (!app) {
+    throw new Error("App container not found");
+  }
+  return app;
+};
 
+const getCurrentRoute = (): string => normalizeHash(window.location.hash);
 const normalizeHash = (hash: string) => {
   const value = hash.replace(/^#/, "").trim();
 
   return value === "" ? "/" : value.startsWith("/") ? value : `/${value}`;
 };
 
-const getCurrentRoute = (): string => normalizeHash(window.location.hash);
+const updateActiveLinks = () => {
+  const links =
+    getApp().querySelectorAll<HTMLAnchorElement>("[data-route-link]");
 
-const navigate = () => {
-  const route = getCurrentRoute();
-
-  app.innerHTML = renderPage(route);
-
-  const links = app.querySelectorAll<HTMLAnchorElement>("[data-route-link]");
   links.forEach((link) => {
-    const isActive = normalizeHash(link.hash) === route;
+    const isActive = normalizeHash(link.hash) === getCurrentRoute();
 
     if (isActive) {
       link.setAttribute("aria-current", "page");
@@ -56,13 +44,33 @@ const navigate = () => {
   });
 };
 
+export const renderPage = () => {
+  const currentRoute = getCurrentRoute();
+  const page = getCurrentPage(currentRoute);
+  const context: PageContext = {
+    route: currentRoute,
+    root: getApp(),
+    refresh: renderPage,
+  };
+
+  getApp().innerHTML = `
+    ${renderNavbar()}
+    <main class="page-shell">
+      ${page.render(context)}
+    </main>
+  `;
+  updateActiveLinks();
+
+  page.mount?.(context);
+};
+
 export const startRouter = () => {
-  window.addEventListener("hashchange", navigate);
+  window.addEventListener("hashchange", renderPage);
 
   if (!window.location.hash) {
     window.location.hash = "#/";
     return;
   }
 
-  navigate();
+  renderPage();
 };

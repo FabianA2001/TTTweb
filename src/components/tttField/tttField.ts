@@ -24,13 +24,14 @@ export const renderTicTacToeField = (board: Board): string => {
           const value = symbolMap[cell];
 
           return `
-            <div
+            <button
+              type="button"
               class="ttt-field__cell"
-              role="gridcell"
+              data-cell-index="${index}"
               aria-label="Row ${row + 1}, Column ${column + 1}${value ? `, ${value}` : ", empty"}"
             >
               ${value}
-            </div>
+            </button>
           `;
         })
         .join("")}
