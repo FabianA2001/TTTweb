@@ -6,20 +6,9 @@ let refreshPage: (() => void) | null = null;
 let isTicTacToeBound = false;
 let game = new Game(3);
 
-function cellIndexToRowAndColumn(cellIndex: number) {
-  const size = game.getSize();
-  const cellCount = size * size;
-
-  if (!Number.isInteger(cellIndex) || cellIndex < 0 || cellIndex >= cellCount) {
-    return;
-  }
-
-  const row = Math.floor(cellIndex / size);
-  const column = cellIndex % size;
-  return [row, column];
-}
-
-function handleTicTacToeClick(event: MouseEvent) {
+function mouseEventToRowAndColumn(
+  event: MouseEvent,
+): [number, number] | undefined {
   const target = event.target;
 
   if (!(target instanceof Element)) {
@@ -37,7 +26,20 @@ function handleTicTacToeClick(event: MouseEvent) {
   if (!Number.isInteger(cellIndex)) {
     return;
   }
-  const coords = cellIndexToRowAndColumn(cellIndex);
+  const size = game.getSize();
+  const cellCount = size * size;
+
+  if (!Number.isInteger(cellIndex) || cellIndex < 0 || cellIndex >= cellCount) {
+    return;
+  }
+
+  const row = Math.floor(cellIndex / size);
+  const column = cellIndex % size;
+  return [row, column];
+}
+
+function handleTicTacToeClick(event: MouseEvent) {
+  const coords = mouseEventToRowAndColumn(event);
   if (!coords) return;
   const [row, column] = coords;
   game.makeMove(row, column);
