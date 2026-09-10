@@ -1,0 +1,27 @@
+{
+  "name": "@tttweb/backend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts"
+  },
+  "dependencies": {
+    "@tttweb/shared": "file:../shared",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.2",
+    "eslint": "^10.10.0",
+    "install": "^0.13.0",
+    "nodemon": "^3.1.14",
+    "npm": "^11.19.1",
+    "prettier": "^3.9.6",
+    "ts-node": "^10.9.2",
+    "typescript": "~6.0.2"
+  }
+}
