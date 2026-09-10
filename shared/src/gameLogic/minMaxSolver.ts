@@ -1,11 +1,6 @@
 import { Board, CellState } from "./board";
 import { Game } from "./game";
 
-type Move = {
-  row: number;
-  column: number;
-};
-
 function isBoardFull(board: Board): boolean {
   return board.getBoard().every((cell) => cell !== CellState.Empty);
 }
@@ -70,13 +65,17 @@ function minimax(
   return bestScore;
 }
 
-function getBestMove(board: Board, player: CellState): Move | null {
+export function getBestMove(
+  board: Board,
+  player: CellState,
+): [number, number] | null {
   if (evaluateTerminal(board, player) !== null) {
     return null;
   }
 
   const size = board.getSize();
-  let bestMove: Move | null = null;
+  let bestRow: number | null = null;
+  let bestColum: number | null = null;
   let bestScore = Number.NEGATIVE_INFINITY;
   const nextPlayer =
     player === CellState.Cross ? CellState.Circle : CellState.Cross;
@@ -93,15 +92,18 @@ function getBestMove(board: Board, player: CellState): Move | null {
 
       if (score > bestScore) {
         bestScore = score;
-        bestMove = { row, column };
+        bestRow = row;
+        bestColum = column;
       }
     }
   }
 
-  return bestMove;
+  if (bestRow === null || bestColum === null) {
+    return null;
+  }
+  return [bestRow, bestColum];
 }
 
 export function getBestNextMove(game: Game): [number, number] | null {
-  let bestmove = getBestMove(game.getBoard(), game.getCurrentPlayer());
-  return bestmove ? [bestmove.row, bestmove.column] : null;
+  return getBestMove(game.getBoard(), game.getCurrentPlayer());
 }
