@@ -14,10 +14,16 @@ export class Game {
   private currentPlayer: CellState;
   private size: number;
 
-  constructor(size: number) {
-    this.board = new Board(size);
-    this.currentPlayer = CellState.Cross;
+  constructor(size: number, board?: Board, currentPlayer?: CellState) {
     this.size = size;
+
+    if (board && currentPlayer) {
+      this.board = board;
+      this.currentPlayer = currentPlayer;
+    } else {
+      this.board = new Board(size);
+      this.currentPlayer = CellState.Cross;
+    }
   }
 
   getBoard(): Board {

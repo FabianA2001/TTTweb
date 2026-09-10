@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { items } from "../models/item.ts";
 import type { Item } from "../models/item.ts";
-import { getBestMove } from "@tttweb/shared/gameLogic/minMaxSolver";
 
 // Create an item
 export const createItem = (req: Request, res: Response, next: NextFunction) => {
@@ -19,20 +18,6 @@ export const createItem = (req: Request, res: Response, next: NextFunction) => {
 export const getItems = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json(items);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getNextMove = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { board, player } = req.body;
-    const nextMove = getBestMove(board, player);
-    res.json(nextMove);
   } catch (error) {
     next(error);
   }
