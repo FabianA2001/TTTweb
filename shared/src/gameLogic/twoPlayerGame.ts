@@ -1,4 +1,4 @@
-import { Game, GameState } from "./game";
+import { Game, GameState } from "./game.ts";
 
 export class TwoPlayerGame extends Game {
   constructor(size: number) {

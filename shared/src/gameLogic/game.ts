@@ -1,11 +1,13 @@
-import { Board, CellState } from "./board";
+import { Board, CellState } from "./board.ts";
 
-export enum GameState {
-  InProgress,
-  Draw,
-  CrossWins,
-  CircleWins,
-}
+export const GameState = {
+  InProgress: 0,
+  Draw: 1,
+  CrossWins: 2,
+  CircleWins: 3,
+} as const;
+
+export type GameState = (typeof GameState)[keyof typeof GameState];
 
 export class Game {
   private readonly board: Board;

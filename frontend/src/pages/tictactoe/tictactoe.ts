@@ -1,17 +1,18 @@
 import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
 import { GameState, OnePlayerGame, TwoPlayerGame } from "@tttweb/shared";
 import type { Page } from "../page.ts";
-import "./tictactoe.css";
 
 let refreshPage: (() => void) | null = null;
 let gameState: GameState = GameState.InProgress;
 let isTicTacToeBound = false;
 let game = new TwoPlayerGame(3);
 
-enum GameMode {
-  OnePlayer = "one-player",
-  TwoPlayer = "two-player",
-}
+const GameMode = {
+  OnePlayer: "one-player",
+  TwoPlayer: "two-player",
+} as const;
+
+type GameMode = (typeof GameMode)[keyof typeof GameMode];
 
 function startGame(mode: GameMode): void {
   gameState = GameState.InProgress;

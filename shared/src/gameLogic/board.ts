@@ -1,11 +1,13 @@
-export enum CellState {
-  Empty = "leer",
-  Cross = "Kreuz",
-  Circle = "Kreis",
-}
+export const CellState = {
+  Empty: "leer",
+  Cross: "Kreuz",
+  Circle: "Kreis",
+} as const;
+
+export type CellState = (typeof CellState)[keyof typeof CellState];
 
 export type WinnerInfo = {
-  winner: CellState.Cross | CellState.Circle;
+  winner: typeof CellState.Cross | typeof CellState.Circle;
   cells: Array<[number, number]>;
 };
 

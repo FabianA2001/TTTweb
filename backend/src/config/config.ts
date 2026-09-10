@@ -6,7 +6,7 @@ interface Config {
   port: number;
   nodeEnv: string;
 }
-
+// read from .env file and set the environment variables
 const config: Config = {
   port: Number(process.env.PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || "development",

@@ -1,5 +1,5 @@
-import { Board, CellState } from "./board";
-import { Game } from "./game";
+import { Board, CellState } from "./board.ts";
+import { Game } from "./game.ts";
 
 function isBoardFull(board: Board): boolean {
   return board.getBoard().every((cell) => cell !== CellState.Empty);

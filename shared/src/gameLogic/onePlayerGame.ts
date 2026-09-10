@@ -1,5 +1,5 @@
-import { getBestNextMove } from "./minMaxSolver";
-import { Game, GameState } from "./game";
+import { getBestNextMove } from "./minMaxSolver.ts";
+import { Game, GameState } from "./game.ts";
 
 export class OnePlayerGame extends Game {
   constructor(size: number) {
