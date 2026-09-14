@@ -1,7 +1,11 @@
 import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
 import { compactGameToGame, Game } from "@tttweb/shared";
 import type { Page } from "../page.ts";
-import { createGame, subscribeToSocked } from "./apiController.ts";
+import {
+  createGame,
+  subscribeToSocked,
+  getGameState,
+} from "./apiController.ts";
 
 let refreshPage: (() => void) | null = null;
 let game: Game | null = null;
@@ -14,10 +18,10 @@ function bindGameModeButtons(root: HTMLElement): void {
     'button[data-game-mode="createGame"]',
   );
   createGameButton?.addEventListener("click", async () => {
-    const id = await createGame();
-    gameId = id;
+    gameId = await createGame();
+    game = await getGameState(gameId);
     refreshPage?.();
-    subscribeToSocked(id, socket);
+    subscribeToSocked(gameId, socket);
   });
 }
 
