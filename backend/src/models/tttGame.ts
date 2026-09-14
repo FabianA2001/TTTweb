@@ -17,8 +17,9 @@ export class GameStore {
   }
 
   createGame(): string {
-    // const id = crypto.randomUUID();
-    const id = "1"; //TODO delete
+    const id = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
     const game = new Game(this.SIZE);
 
     this.games.set(id, game);
