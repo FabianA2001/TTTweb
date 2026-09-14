@@ -1,5 +1,5 @@
 import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
-import { GameState, OnePlayerGame, TwoPlayerGame, Game } from "@tttweb/shared";
+import { compactGameToGame, Game } from "@tttweb/shared";
 import type { Page } from "../page.ts";
 import { createGame, subscribeToSocked } from "./apiController.ts";
 
@@ -35,14 +35,20 @@ export const tttMonitor: Page = {
     `;
   },
   mount: ({ root, refresh }) => {
-    console.log("Mounting TTT Monitor page");
     refreshPage = refresh;
     bindGameModeButtons(root);
     if (!mounted) {
+      console.log("Mounting TTT Monitor page first Time");
       mounted = true;
       socket = new WebSocket("ws://localhost:3000/ws/game");
       socket.addEventListener("open", () => {
         console.log("Connected to gameWebSocket server");
+      });
+      socket.addEventListener("message", (event) => {
+        const message = JSON.parse(event.data);
+
+        game = compactGameToGame(message);
+        refreshPage?.();
       });
     }
   },

@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import {
-  boardToCompactBoard as gameToCompactGame,
-  compactBoardToBoard,
+  gameToCompactGame as gameToCompactGame,
+  compactGameToGame,
   getBestNextMove,
 } from "@tttweb/shared";
 import type { Game, compactGame } from "@tttweb/shared";
@@ -14,7 +14,7 @@ export const getBestMove = (
 ) => {
   try {
     const compactGame = req.body as compactGame;
-    const game: Game = compactBoardToBoard(compactGame);
+    const game: Game = compactGameToGame(compactGame);
     const nextMove = getBestNextMove(game);
 
     if (!nextMove) {
@@ -22,7 +22,7 @@ export const getBestMove = (
       return;
     }
 
-    game.makeMove(nextMove[0], nextMove[1]);
+    game.gameturn(nextMove[0], nextMove[1]);
     const updatedCompactGame = gameToCompactGame(game);
     res.json(updatedCompactGame);
   } catch (error) {
@@ -113,8 +113,10 @@ export const makeMove = (req: Request, res: Response, next: NextFunction) => {
 
     const { row, col } = req.body as { row: number; col: number };
 
-    if (!game.makeMove(row, col)) {
-      res.status(400).json({ error: "Invalid move" });
+    try {
+      game.gameturn(row, col);
+    } catch (error) {
+      res.status(400).json({ error: { error } });
       return;
     }
 
@@ -151,7 +153,7 @@ export const aiMakesMove = (
       return;
     }
 
-    game.makeMove(nextMove[0], nextMove[1]);
+    game.gameturn(nextMove[0], nextMove[1]);
     const compactGame = gameToCompactGame(game);
     res.json(compactGame);
   } catch (error) {

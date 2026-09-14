@@ -12,7 +12,7 @@ export interface compactGame {
   status: GameState;
 }
 
-export function compactBoardToBoard(compact: compactGame): Game {
+export function compactGameToGame(compact: compactGame): Game {
   if (compact.board.length !== compact.size * compact.size) {
     throw new Error(
       `Expected array of length ${compact.size * compact.size}(${compact.size} * ${compact.size}), got ${compact.board.length}`,
@@ -38,7 +38,7 @@ export function compactBoardToBoard(compact: compactGame): Game {
   );
 }
 
-export function boardToCompactBoard(game: Game): compactGame {
+export function gameToCompactGame(game: Game): compactGame {
   const size = game.getSize();
   const board: Array<number> = [];
   for (let row = 0; row < size; row++) {
