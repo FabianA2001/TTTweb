@@ -1,7 +1,7 @@
 import requests
 
 # API-Adresse anpassen
-API_URL = "http://localhost:3000/api/ttt/next-move"
+API_URL = "http://localhost:3000/api/ttt/get-best-move"
 
 
 def printBoard(board):
