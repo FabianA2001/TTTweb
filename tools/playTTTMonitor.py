@@ -28,7 +28,6 @@ def make_player_move(game_id, row, col, player="1"):
         return None
 
     print(f"❌ API-Fehler: {response.status_code}")
-    print(response.text)
 
     return None
 
@@ -94,6 +93,5 @@ if __name__ == "__main__":
 
             if result:
                 print("✅ Zug erfolgreich gemacht!")
-                print(result)
             else:
                 print("❌ Zug konnte nicht gemacht werden.")
