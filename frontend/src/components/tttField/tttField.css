@@ -10,6 +10,7 @@
 }
 
 .ttt-field__cell {
+  position: relative;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
@@ -23,6 +24,20 @@
   font: inherit;
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
+  user-select: none;
+}
+
+.ttt-field__number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  color: #64748b;
+  opacity: 0.35;
+  pointer-events: none;
   user-select: none;
 }
 

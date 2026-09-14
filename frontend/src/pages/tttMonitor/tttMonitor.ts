@@ -30,7 +30,7 @@ export const tttMonitor: Page = {
         <div class="game-mode-actions">
           <button type="button" data-game-mode="createGame">Create Game</button>
         </div>
-        ${game ? renderTicTacToeField(game.getBoard()) : ""}
+        ${game ? renderTicTacToeField(game.getBoard(), true) : ""}
       </section>
     `;
   },

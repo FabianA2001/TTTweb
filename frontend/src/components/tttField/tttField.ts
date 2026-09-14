@@ -7,7 +7,10 @@ const symbolMap: Record<CellState, string> = {
   [CellState.Circle]: "O",
 };
 
-export function renderTicTacToeField(board: Board): string {
+export function renderTicTacToeField(
+  board: Board,
+  showFieldNumbers = false,
+): string {
   if (!(board instanceof Board)) {
     throw new Error("renderTicTacToeField expects an instance of Board.");
   }
@@ -23,6 +26,7 @@ export function renderTicTacToeField(board: Board): string {
           const column = index % size;
           const value = symbolMap[cell];
           const marked = board.isMarked(row, column);
+          const fieldNumber = index + 1;
 
           return `
             <button
@@ -32,6 +36,11 @@ export function renderTicTacToeField(board: Board): string {
               data-marked="${marked}"
               aria-label="Row ${row + 1}, Column ${column + 1}${value ? `, ${value}` : ", empty"}${marked ? ", marked" : ""}"
             >
+              ${
+                showFieldNumbers && !value
+                  ? `<span class="ttt-field__number">${fieldNumber}</span>`
+                  : ""
+              }
               ${value}
             </button>
           `;
