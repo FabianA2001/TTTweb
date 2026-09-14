@@ -8,6 +8,7 @@ export function renderNavbar(): string {
 			<nav class="navbar__link" aria-label="Hauptnavigation">
 				<a href="#/tictactoe" data-route-link>Tic Tac Toe</a>
 				<a href="#/api" data-route-link>API</a>
+				<a href="#/ttt-monitor" data-route-link>TTT Monitor</a>
 			</nav>
 		</div>
 	</header>

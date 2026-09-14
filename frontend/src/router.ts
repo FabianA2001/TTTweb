@@ -1,5 +1,6 @@
 import { ticTacToe } from "./pages/tictactoe/tictactoe.ts";
 import { apiPage } from "./pages/apiPage.ts";
+import { tttMonitor } from "./pages/tttMonitor/tttMonitor.ts";
 import { homePage } from "./pages/home.ts";
 import { notFoundPage } from "./pages/notFound.ts";
 import { renderNavbar } from "./components/nevbar/nevbar.ts";
@@ -9,6 +10,7 @@ const pages: Record<string, Page> = {
   "/": homePage,
   "/tictactoe": ticTacToe,
   "/api": apiPage,
+  "/ttt-monitor": tttMonitor,
 };
 function getCurrentPage(route: string): Page {
   return pages[route] ?? notFoundPage;

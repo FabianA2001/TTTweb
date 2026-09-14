@@ -13,6 +13,12 @@
     "build": "npm run build --workspace=frontend && npm run build --workspace=backend"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/ws": "^8.18.1",
     "concurrently": "^9.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "ws": "^8.21.3"
   }
 }
