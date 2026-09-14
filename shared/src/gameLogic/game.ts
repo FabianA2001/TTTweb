@@ -9,20 +9,46 @@ export const GameState = {
 
 export type GameState = (typeof GameState)[keyof typeof GameState];
 
+export type GameChangeListener = (game: Game) => void;
+
 export class Game {
   private readonly board: Board;
   private currentPlayer: CellState;
+  private gameState: GameState;
   private size: number;
+  private listeners = new Set<GameChangeListener>();
 
-  constructor(size: number, board?: Board, currentPlayer?: CellState) {
+  constructor(
+    size: number,
+    board?: Board,
+    currentPlayer?: CellState,
+    gameState?: GameState,
+  ) {
     this.size = size;
 
-    if (board && currentPlayer) {
+    if (board && currentPlayer && gameState) {
       this.board = board;
       this.currentPlayer = currentPlayer;
+      this.gameState = gameState;
     } else {
       this.board = new Board(size);
       this.currentPlayer = CellState.Cross;
+      this.gameState = GameState.InProgress;
+    }
+  }
+
+  subscribe(listener: GameChangeListener): () => void {
+    this.listeners.add(listener);
+
+    // Funktion zum Abmelden zurückgeben
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  private notifyChange(): void {
+    for (const listener of this.listeners) {
+      listener(this);
     }
   }
 
@@ -37,17 +63,24 @@ export class Game {
     return this.currentPlayer;
   }
 
+  getGameState(): GameState {
+    return this.gameState;
+  }
+
   gameturn(row: number, column: number): GameState {
     if (!this.makeMove(row, column)) {
       throw new Error("Cell is already occupied");
     }
     if (this.checkDraw()) {
+      this.gameState = GameState.Draw;
       return GameState.Draw;
     }
-    return this.checkWinnerAndMark();
+    this.gameState = this.checkWinnerAndMark();
+    this.notifyChange();
+    return this.gameState;
   }
 
-  makeMove(row: number, column: number): boolean {
+  private makeMove(row: number, column: number): boolean {
     if (this.board.getCell(row, column) !== CellState.Empty) {
       return false; // Cell is already occupied
     }
@@ -57,11 +90,11 @@ export class Game {
     return true;
   }
 
-  checkDraw(): boolean {
+  private checkDraw(): boolean {
     return this.board.getBoard().every((cell) => cell !== CellState.Empty);
   }
 
-  checkWinnerAndMark(): GameState {
+  private checkWinnerAndMark(): GameState {
     const winner = this.board.getWinner();
 
     for (let row = 0; row < this.board.getSize(); row++) {

@@ -1,4 +1,4 @@
-import { Game } from "../gameLogic/game.ts";
+import { Game, GameState } from "../gameLogic/game.ts";
 import { Board } from "../gameLogic/board.ts";
 
 export interface compactGame {
@@ -8,6 +8,8 @@ export interface compactGame {
   board: Array<number>;
   // The current player represented as a boolean (true for player cross, false for player circle)
   aktivePlayer: boolean;
+  // Gamestatus (0 for in progress, 1 for draw, 2 for player cross wins, 3 for player circle wins)
+  status: GameState;
 }
 
 export function compactBoardToBoard(compact: compactGame): Game {
@@ -32,6 +34,7 @@ export function compactBoardToBoard(compact: compactGame): Game {
     compact.size,
     board,
     compact.aktivePlayer ? "Kreuz" : "Kreis",
+    compact.status,
   );
 }
 
@@ -54,5 +57,6 @@ export function boardToCompactBoard(game: Game): compactGame {
     size: size,
     board: board,
     aktivePlayer: game.getCurrentPlayer() === "Kreuz",
+    status: game.getGameState(),
   };
 }
