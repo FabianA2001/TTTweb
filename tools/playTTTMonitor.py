@@ -36,7 +36,10 @@ def make_player_move(game_id, row, col, player="1"):
 def get_game(game_id):
     """Holt den aktuellen Spielstand von der API."""
 
-    response = requests.get(f"{BASE_URL}/game/{game_id}", timeout=5)
+    response = requests.get(
+        f"{BASE_URL}/game/{game_id}",
+        timeout=5,
+    )
 
     if response.status_code != 200:
         print(f"Fehler beim Abrufen des Spiels: {response.status_code}")
@@ -46,22 +49,51 @@ def get_game(game_id):
     return response.json()
 
 
+def index_to_position(index, size=3):
+
+    if index < 1 or index > size * size:
+        raise ValueError(f"Feldnummer muss zwischen 1 und {size * size} liegen.")
+
+    zero_based_index = index - 1
+
+    row = zero_based_index // size
+    col = zero_based_index % size
+
+    return row, col
+
+
 if __name__ == "__main__":
     while True:
         game_id = input("Gib die Game-ID ein: ")
         player = input("Gib die Spieler-ID ein (1 oder 0): ")
+
         while True:
             try:
-                row = int(input("Gib die Zeile für den Zug ein (0-2): "))
-                col = int(input("Gib die Spalte für den Zug ein (0-2): "))
+                field_index = int(input("Gib die Feldnummer für den Zug ein: "))
 
-                result = make_player_move(game_id, row, col, player)
+                row, col = index_to_position(field_index)
+
+                result = make_player_move(
+                    game_id,
+                    row,
+                    col,
+                    player,
+                )
+
+            except ValueError as e:
+                print(f"❌ Ungültige Eingabe: {e}")
+                continue
+
+            except requests.RequestException as e:
+                print(f"❌ Fehler beim Senden des Zugs: {e}")
+                continue
+
             except Exception as e:
-                print(f"Fehler beim Senden des Zugs: {e}")
+                print(f"❌ Fehler: {e}")
                 continue
 
             if result:
-                print("Zug erfolgreich gemacht!")
+                print("✅ Zug erfolgreich gemacht!")
                 print(result)
             else:
-                print("Zug konnte nicht gemacht werden.")
+                print("❌ Zug konnte nicht gemacht werden.")
