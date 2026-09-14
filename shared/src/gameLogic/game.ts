@@ -26,15 +26,9 @@ export class Game {
   ) {
     this.size = size;
 
-    if (board && currentPlayer && gameState) {
-      this.board = board;
-      this.currentPlayer = currentPlayer;
-      this.gameState = gameState;
-    } else {
-      this.board = new Board(size);
-      this.currentPlayer = CellState.Cross;
-      this.gameState = GameState.InProgress;
-    }
+    this.board = board ?? new Board(size);
+    this.currentPlayer = currentPlayer ?? CellState.Cross;
+    this.gameState = gameState ?? GameState.InProgress;
   }
 
   subscribe(listener: GameChangeListener): () => void {
