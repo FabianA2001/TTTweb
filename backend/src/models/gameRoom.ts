@@ -10,7 +10,7 @@ interface GameRoom {
 
 class GameRoomManager {
   private gameRooms: Map<string, GameRoom> = new Map();
-  private currentSymbol: number = 0; // Start with symbol 1 for the first player
+  private currentSymbol: number = 1; // Start with symbol 1 for the first player
 
   createGameRoom(): string {
     let roomId: string;
