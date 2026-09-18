@@ -1,5 +1,4 @@
 import express from "express";
-import itemRoutes from "./routes/itemRoutes.ts";
 import tttRoutes from "./routes/gameRoutes.ts";
 import { errorHandler } from "./middlewares/errorHandler.ts";
 import cors from "cors";
