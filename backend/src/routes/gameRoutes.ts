@@ -1,12 +1,12 @@
 import { Router } from "express";
 import {
-  getBestMove,
   createGame,
   deleteGame,
   makeMove,
   getGame,
   aiMakesMove,
-} from "../controllers/tttController.ts";
+} from "../controllers/gameController.ts";
+import { getBestMove } from "../controllers/infoConstroller.ts";
 
 const router = Router();
 
