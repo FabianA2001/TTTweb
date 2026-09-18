@@ -4,6 +4,7 @@ import {
   getBestNextMove,
 } from "@tttweb/shared";
 import { gameStore } from "../models/GameStore.ts";
+import type { Game } from "@tttweb/shared";
 
 export const createGame = (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -65,23 +66,26 @@ export const makeMove = (req: Request, res: Response, next: NextFunction) => {
       return;
     }
 
-    const game = gameStore.getGame(id);
+    const game: Game | undefined = gameStore.getGame(id);
 
     if (!game) {
       res.status(404).json({ error: "Game not found" });
       return;
     }
 
-    //  (true for player cross, false for player circle)
-    const player = req.params.player;
-    if (player !== "1" && player !== "0") {
-      res.status(400).json({ error: "Invalid player" });
+    const player = Number(req.params.player);
+
+    if (Number.isNaN(player)) {
+      res.status(400).json({ error: "Invalid player (not a Number)" });
       return;
     }
-    if (
-      (player === "1" && game.getCurrentPlayer() !== "Kreuz") ||
-      (player === "0" && game.getCurrentPlayer() !== "Kreis")
-    ) {
+
+    if (player > game.getNumberOfPlayers() || player < 1) {
+      res.status(400).json({ error: "Invalid player (to big)" });
+      return;
+    }
+
+    if (player !== game.getCurrentPlayer()) {
       res.status(409).json({ error: "Not your turn" });
       return;
     }

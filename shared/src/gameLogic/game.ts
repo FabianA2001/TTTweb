@@ -1,10 +1,9 @@
-import { Board, CellState } from "./board.ts";
+import { Board } from "./board.ts";
 
 export const GameState = {
   InProgress: 0,
   Draw: 1,
-  CrossWins: 2,
-  CircleWins: 3,
+  Winner: 3,
 } as const;
 
 export type GameState = (typeof GameState)[keyof typeof GameState];
@@ -13,22 +12,26 @@ export type GameChangeListener = (game: Game) => void;
 
 export class Game {
   private readonly board: Board;
-  private currentPlayer: CellState;
+  private currentPlayer: number;
   private gameState: GameState;
   private size: number;
   private listeners = new Set<GameChangeListener>();
+  private winner: number | null = null;
+  private numberOfPlayers: number;
 
   constructor(
     size: number,
     board?: Board,
-    currentPlayer?: CellState,
+    currentPlayer?: number,
     gameState?: GameState,
+    numberOfPlayers?: number,
   ) {
     this.size = size;
 
     this.board = board ?? new Board(size);
-    this.currentPlayer = currentPlayer ?? CellState.Cross;
+    this.currentPlayer = currentPlayer ?? 1;
     this.gameState = gameState ?? GameState.InProgress;
+    this.numberOfPlayers = numberOfPlayers ?? 2;
   }
 
   subscribe(listener: GameChangeListener): () => void {
@@ -53,12 +56,18 @@ export class Game {
     return this.size;
   }
 
-  getCurrentPlayer(): CellState {
+  getCurrentPlayer(): number {
     return this.currentPlayer;
   }
 
   getGameState(): GameState {
     return this.gameState;
+  }
+  getWinner(): number | null {
+    return this.winner;
+  }
+  getNumberOfPlayers(): number {
+    return this.numberOfPlayers;
   }
 
   gameturn(row: number, column: number): GameState {
@@ -75,17 +84,17 @@ export class Game {
   }
 
   private makeMove(row: number, column: number): boolean {
-    if (this.board.getCell(row, column) !== CellState.Empty) {
+    if (this.board.getCell(row, column) !== 0) {
       return false; // Cell is already occupied
     }
 
     this.board.setCell(row, column, this.currentPlayer);
-    this.switchPlayer();
+    this.nextPlayer();
     return true;
   }
 
   private checkDraw(): boolean {
-    return this.board.getBoard().every((cell) => cell !== CellState.Empty);
+    return this.board.getBoard().every((cell) => cell !== 0);
   }
 
   private checkWinnerAndMark(): GameState {
@@ -103,15 +112,11 @@ export class Game {
       this.board.setMark(row, column, true);
     }
 
-    return winner.winner === CellState.Cross
-      ? GameState.CrossWins
-      : GameState.CircleWins;
+    this.winner = winner.winner;
+    return GameState.Winner;
   }
 
-  private switchPlayer(): void {
-    this.currentPlayer =
-      this.currentPlayer === CellState.Cross
-        ? CellState.Circle
-        : CellState.Cross;
+  private nextPlayer(): void {
+    this.currentPlayer = (this.currentPlayer % this.numberOfPlayers) + 1;
   }
 }

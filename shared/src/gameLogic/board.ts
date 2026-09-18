@@ -1,22 +1,14 @@
-export const CellState = {
-  Empty: "leer",
-  Cross: "Kreuz",
-  Circle: "Kreis",
-} as const;
-
-export type CellState = (typeof CellState)[keyof typeof CellState];
-
 export type WinnerInfo = {
-  winner: typeof CellState.Cross | typeof CellState.Circle;
+  winner: number;
   cells: Array<[number, number]>;
 };
 
 export class Board {
   private readonly size: number;
-  private readonly cells: CellState[];
+  private readonly cells: number[];
   private readonly marks: boolean[];
 
-  constructor(size: number, startValue: CellState = CellState.Empty) {
+  constructor(size: number, startValue: number = 0) {
     if (!Number.isInteger(size) || size <= 0) {
       throw new Error("The board size must be a positive integer.");
     }
@@ -30,44 +22,37 @@ export class Board {
     return this.size;
   }
 
-  getBoard(): CellState[] {
+  getBoard(): number[] {
     return [...this.cells];
   }
 
   getWinner(): WinnerInfo | null {
     const size = this.size;
+    const EMPTY = 0;
+
+    const checkLine = (values: number[]): number | null => {
+      const first = values[0];
+      if (first === EMPTY) {
+        return null;
+      }
+      return values.every((cell) => cell === first) ? first : null;
+    };
 
     for (let row = 0; row < size; row++) {
-      const rowValues = this.getRow(row);
-
-      if (rowValues.every((cell) => cell === CellState.Cross)) {
+      const winner = checkLine(this.getRow(row));
+      if (winner !== null) {
         return {
-          winner: CellState.Cross,
-          cells: Array.from({ length: size }, (_, column) => [row, column]),
-        };
-      }
-
-      if (rowValues.every((cell) => cell === CellState.Circle)) {
-        return {
-          winner: CellState.Circle,
+          winner,
           cells: Array.from({ length: size }, (_, column) => [row, column]),
         };
       }
     }
 
     for (let column = 0; column < size; column++) {
-      const columnValues = this.getColumn(column);
-
-      if (columnValues.every((cell) => cell === CellState.Cross)) {
+      const winner = checkLine(this.getColumn(column));
+      if (winner !== null) {
         return {
-          winner: CellState.Cross,
-          cells: Array.from({ length: size }, (_, row) => [row, column]),
-        };
-      }
-
-      if (columnValues.every((cell) => cell === CellState.Circle)) {
-        return {
-          winner: CellState.Circle,
+          winner,
           cells: Array.from({ length: size }, (_, row) => [row, column]),
         };
       }
@@ -82,39 +67,18 @@ export class Board {
       (_, index) => [index, size - 1 - index] as [number, number],
     );
 
-    const firstDiagonalValues = firstDiagonal.map(([row, column]) =>
-      this.getCell(row, column),
+    const firstDiagonalWinner = checkLine(
+      firstDiagonal.map(([row, column]) => this.getCell(row, column)),
     );
-    const secondDiagonalValues = secondDiagonal.map(([row, column]) =>
-      this.getCell(row, column),
+    if (firstDiagonalWinner !== null) {
+      return { winner: firstDiagonalWinner, cells: firstDiagonal };
+    }
+
+    const secondDiagonalWinner = checkLine(
+      secondDiagonal.map(([row, column]) => this.getCell(row, column)),
     );
-
-    if (firstDiagonalValues.every((cell) => cell === CellState.Cross)) {
-      return {
-        winner: CellState.Cross,
-        cells: firstDiagonal,
-      };
-    }
-
-    if (firstDiagonalValues.every((cell) => cell === CellState.Circle)) {
-      return {
-        winner: CellState.Circle,
-        cells: firstDiagonal,
-      };
-    }
-
-    if (secondDiagonalValues.every((cell) => cell === CellState.Cross)) {
-      return {
-        winner: CellState.Cross,
-        cells: secondDiagonal,
-      };
-    }
-
-    if (secondDiagonalValues.every((cell) => cell === CellState.Circle)) {
-      return {
-        winner: CellState.Circle,
-        cells: secondDiagonal,
-      };
+    if (secondDiagonalWinner !== null) {
+      return { winner: secondDiagonalWinner, cells: secondDiagonal };
     }
 
     return null;
@@ -124,15 +88,15 @@ export class Board {
     return [...this.marks];
   }
 
-  getCell(row: number, column: number): CellState {
+  getCell(row: number, column: number): number {
     return this.cells[this.getIndex(row, column)];
   }
 
-  setCell(row: number, column: number, value: CellState): void {
+  setCell(row: number, column: number, value: number): void {
     this.cells[this.getIndex(row, column)] = value;
   }
 
-  getRow(row: number): CellState[] {
+  getRow(row: number): number[] {
     this.assertInRange(row, "row");
 
     const start = row * this.size;
@@ -140,7 +104,7 @@ export class Board {
     return this.cells.slice(start, start + this.size);
   }
 
-  getColumn(column: number): CellState[] {
+  getColumn(column: number): number[] {
     this.assertInRange(column, "column");
 
     return Array.from(
@@ -149,7 +113,7 @@ export class Board {
     );
   }
 
-  setBoard(values: CellState[]): void {
+  setBoard(values: number[]): void {
     if (values.length !== this.cells.length) {
       throw new Error(
         `The board expects ${this.cells.length} values, but received ${values.length}.`,
@@ -162,7 +126,7 @@ export class Board {
   }
 
   clear(): void {
-    this.cells.fill(CellState.Empty);
+    this.cells.fill(0);
     this.marks.fill(false);
   }
 

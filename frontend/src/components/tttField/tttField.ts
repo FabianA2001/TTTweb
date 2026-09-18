@@ -1,11 +1,17 @@
 import "./tttField.css";
-import { Board, CellState } from "../../../../shared/src/gameLogic/board";
+import { Board } from "../../../../shared/src/gameLogic/board";
 
-const symbolMap: Record<CellState, string> = {
-  [CellState.Empty]: "",
-  [CellState.Cross]: "X",
-  [CellState.Circle]: "O",
-};
+function numberToSymbole(n: number): string {
+  let result = "";
+
+  while (n > 0) {
+    n--;
+    result = String.fromCharCode((n % 26) + 65) + result;
+    n = Math.floor(n / 26);
+  }
+
+  return result;
+}
 
 export function renderTicTacToeField(
   board: Board,
@@ -24,7 +30,7 @@ export function renderTicTacToeField(
         .map((cell, index) => {
           const row = Math.floor(index / size);
           const column = index % size;
-          const value = symbolMap[cell];
+          const value = numberToSymbole(cell);
           const marked = board.isMarked(row, column);
           const fieldNumber = index + 1;
 

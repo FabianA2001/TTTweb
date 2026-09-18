@@ -1,13 +1,13 @@
-import { Board, CellState } from "./board.ts";
+import { Board } from "./board.ts";
 import { Game } from "./game.ts";
 
 function isBoardFull(board: Board): boolean {
-  return board.getBoard().every((cell) => cell !== CellState.Empty);
+  return board.getBoard().every((cell) => cell !== 0);
 }
 
 function evaluateTerminal(
   board: Board,
-  maximizingPlayer: CellState,
+  maximizingPlayer: number,
 ): number | null {
   const winner = board.getWinner()?.winner ?? null;
 
@@ -26,8 +26,8 @@ function evaluateTerminal(
 
 function minimax(
   board: Board,
-  currentPlayer: CellState,
-  maximizingPlayer: CellState,
+  currentPlayer: number,
+  maximizingPlayer: number,
   depth: number,
 ): number {
   const terminalScore = evaluateTerminal(board, maximizingPlayer);
@@ -37,8 +37,7 @@ function minimax(
   }
 
   const size = board.getSize();
-  const nextPlayer =
-    currentPlayer === CellState.Cross ? CellState.Circle : CellState.Cross;
+  const nextPlayer = (currentPlayer % 2) + 1;
   const isMaximizing = currentPlayer === maximizingPlayer;
   let bestScore = isMaximizing
     ? Number.NEGATIVE_INFINITY
@@ -46,13 +45,13 @@ function minimax(
 
   for (let row = 0; row < size; row++) {
     for (let column = 0; column < size; column++) {
-      if (board.getCell(row, column) !== CellState.Empty) {
+      if (board.getCell(row, column) !== 0) {
         continue;
       }
 
       board.setCell(row, column, currentPlayer);
       const score = minimax(board, nextPlayer, maximizingPlayer, depth + 1);
-      board.setCell(row, column, CellState.Empty);
+      board.setCell(row, column, 0);
 
       if (isMaximizing) {
         bestScore = Math.max(bestScore, score);
@@ -65,10 +64,7 @@ function minimax(
   return bestScore;
 }
 
-export function getBestMove(
-  board: Board,
-  player: CellState,
-): [number, number] | null {
+function getBestMove(board: Board, player: number): [number, number] | null {
   if (evaluateTerminal(board, player) !== null) {
     return null;
   }
@@ -77,18 +73,17 @@ export function getBestMove(
   let bestRow: number | null = null;
   let bestColum: number | null = null;
   let bestScore = Number.NEGATIVE_INFINITY;
-  const nextPlayer =
-    player === CellState.Cross ? CellState.Circle : CellState.Cross;
+  const nextPlayer = (player % 2) + 1;
 
   for (let row = 0; row < size; row++) {
     for (let column = 0; column < size; column++) {
-      if (board.getCell(row, column) !== CellState.Empty) {
+      if (board.getCell(row, column) !== 0) {
         continue;
       }
 
       board.setCell(row, column, player);
       const score = minimax(board, nextPlayer, player, 1);
-      board.setCell(row, column, CellState.Empty);
+      board.setCell(row, column, 0);
 
       if (score > bestScore) {
         bestScore = score;
@@ -105,5 +100,8 @@ export function getBestMove(
 }
 
 export function getBestNextMove(game: Game): [number, number] | null {
+  if (game.getNumberOfPlayers() !== 2) {
+    return null;
+  }
   return getBestMove(game.getBoard(), game.getCurrentPlayer());
 }
