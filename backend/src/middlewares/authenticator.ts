@@ -40,11 +40,5 @@ export function authenticate(
     return res.status(401).json({ error: "Token ungültig oder abgelaufen" });
   }
 
-  const player = players.get(payload.playerId);
-  if (!player) {
-    return res.status(401).json({ error: "Spieler existiert nicht" });
-  }
-
-  (req as any).player = player;
   next();
 }
