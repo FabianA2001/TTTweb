@@ -3,7 +3,7 @@ import {
   gameToCompactGame as gameToCompactGame,
   getBestNextMove,
 } from "@tttweb/shared";
-import { gameStore } from "../models/Game.ts";
+import { gameStore } from "../models/GameStore.ts";
 
 export const createGame = (req: Request, res: Response, next: NextFunction) => {
   try {
