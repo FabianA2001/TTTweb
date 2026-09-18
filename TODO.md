@@ -5,3 +5,4 @@
   - Wann lösche ich ein Game im backend
   - Fix draw bei TTT Monitor
   - TODOs in Issues übertragen
+  - Mehr als 2 Spieler
