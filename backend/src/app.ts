@@ -24,7 +24,6 @@ app.use(
 app.use(express.json());
 
 // Routes
-app.use("/api/items", itemRoutes);
 app.use("/api/ttt", tttRoutes);
 
 // Global error handler (should be after routes)
