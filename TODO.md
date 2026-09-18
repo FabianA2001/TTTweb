@@ -6,3 +6,4 @@
   - Fix draw bei TTT Monitor
   - TODOs in Issues übertragen
   - Mehr als 2 Spieler
+  - Add Tests
