@@ -1,8 +1,9 @@
 import { Board } from "./board.ts";
 
 export const GameState = {
-  InProgress: 0,
-  Draw: 1,
+  Preparation: 0,
+  InProgress: 1,
+  Draw: 2,
   Winner: 3,
 } as const;
 
@@ -20,15 +21,14 @@ export class Game {
   private numberOfPlayers: number;
 
   constructor(
-    size: number,
+    size?: number,
     board?: Board,
     currentPlayer?: number,
     gameState?: GameState,
     numberOfPlayers?: number,
   ) {
-    this.size = size;
-
-    this.board = board ?? new Board(size);
+    this.size = size ?? 3;
+    this.board = board ?? new Board(size ?? 3);
     this.currentPlayer = currentPlayer ?? 1;
     this.gameState = gameState ?? GameState.InProgress;
     this.numberOfPlayers = numberOfPlayers ?? 2;
@@ -70,7 +70,26 @@ export class Game {
     return this.numberOfPlayers;
   }
 
+  setNumberOfPlayers(numberOfPlayers: number): void {
+    if (this.gameState !== GameState.Preparation) {
+      throw new Error(
+        "Cannot change number of players after the game has started",
+      );
+    }
+    this.numberOfPlayers = numberOfPlayers;
+  }
+  startGame(): void {
+    if (this.gameState !== GameState.Preparation) {
+      throw new Error("Game is already in progress or finished");
+    }
+    this.gameState = GameState.InProgress;
+    this.notifyChange();
+  }
+
   gameturn(row: number, column: number): GameState {
+    if (this.gameState !== GameState.InProgress) {
+      throw new Error("Game is not in progress");
+    }
     if (!this.makeMove(row, column)) {
       throw new Error("Cell is already occupied");
     }

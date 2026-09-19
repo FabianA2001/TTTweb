@@ -1,73 +1,86 @@
-import { gameStore } from "./GameStore.ts";
-import { Game } from "@tttweb/shared";
+import { Player } from "@tttweb/shared";
 import { randomUUID } from "crypto";
-import { Player } from "./Player.ts";
+import { gameStore } from "./GameStore.ts";
+import type { Board } from "@tttweb/shared";
+import { GameState } from "@tttweb/shared";
+import type { Game } from "@tttweb/shared";
 
-interface GameRoom {
-  gameId: string;
-  players: Map<string, Player>; // playerId -> playerName
-}
-
-class GameRoomManager {
-  private gameRooms: Map<string, GameRoom> = new Map();
+export class GameRoom {
+  private gameId: string;
+  private players: Map<string, Player>;
   private currentSymbol: number = 1; // Start with symbol 1 for the first player
 
-  createGameRoom(): string {
-    let roomId: string;
-    while (true) {
-      roomId = randomUUID();
-      if (!this.gameRooms.has(roomId)) {
-        break;
-      }
-    }
-    const gameId = gameStore.createGame();
-    const gameRoom: GameRoom = {
-      gameId,
-      players: new Map(),
-    };
-    this.gameRooms.set(gameId, gameRoom);
-    return roomId;
+  constructor(
+    size?: number,
+    board?: Board,
+    currentPlayer?: number,
+    numberOfPlayers?: number,
+  ) {
+    this.players = new Map<string, Player>();
+    this.gameId = gameStore.createGame(
+      size,
+      board,
+      currentPlayer,
+      GameState.Preparation,
+      numberOfPlayers,
+    );
   }
 
-  getGame(roomId: string): Game {
-    const gameRoom = this.gameRooms.get(roomId);
-    if (!gameRoom) {
-      throw new Error("Game room not found");
-    }
-    const game = gameStore.getGame(gameRoom.gameId);
+  getGameId(): string {
+    return this.gameId;
+  }
+
+  getGame(): Game {
+    const game = gameStore.getGame(this.gameId);
     if (!game) {
       throw new Error("Game not found");
     }
     return game;
   }
 
-  deleteRoom(roomId: string): boolean {
-    const gameRoom = this.gameRooms.get(roomId);
-    if (!gameRoom) {
-      return false;
+  getPlayers(): Map<string, Player> {
+    return this.players;
+  }
+
+  startGame(): void {
+    const game = gameStore.getGame(this.gameId);
+    if (!game) {
+      throw new Error("Game not found");
     }
-    gameStore.deleteGame(gameRoom.gameId);
-    return this.gameRooms.delete(roomId);
+    game.setNumberOfPlayers(this.players.size);
+    game.startGame();
+  }
+
+  gameTurn(row: number, column: number, playerId: string): void {
+    const game = gameStore.getGame(this.gameId);
+    if (!game) {
+      throw new Error("Game not found");
+    }
+
+    const player = this.players.get(playerId);
+    if (!player) {
+      throw new Error("Player not found");
+    }
+
+    if (game.getCurrentPlayer() !== player.symbol) {
+      throw new Error("It's not this player's turn");
+    }
+
+    game.gameturn(row, column);
   }
 
   addPlayerToRoom(roomId: string, playerName: string): string {
-    const gameRoom = this.gameRooms.get(roomId);
-    if (!gameRoom) {
-      throw new Error("Game room not found");
-    }
     let playerId: string;
     do {
       playerId = randomUUID();
-    } while (gameRoom.players.has(playerId));
+    } while (this.players.has(playerId));
 
     const player: Player = {
       name: playerName,
       symbol: this.currentSymbol,
     };
     this.currentSymbol++; // Increment symbol for the next player
-    gameRoom.players.set(playerId, player);
+    this.players.set(playerId, player);
     return playerId;
   }
 }
-
-export const gameRoomManager = new GameRoomManager();

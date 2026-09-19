@@ -1,10 +1,10 @@
 import { Game } from "@tttweb/shared";
 import { gameWebSocketManager } from "../websocket/gameWebSocketManager.ts";
 import { gameToCompactGame } from "@tttweb/shared";
+import type { Board, GameState } from "@tttweb/shared";
 
 export class GameStore {
   private games = new Map<string, Game>();
-  private SIZE = 3;
 
   private addGameChangeListenerToGameWebSockedManger(
     gameId: string,
@@ -16,15 +16,26 @@ export class GameStore {
     });
   }
 
-  createGame(): string {
+  createGame(
+    size?: number,
+    board?: Board,
+    currentPlayer?: number,
+    gameState?: GameState,
+    numberOfPlayers?: number,
+  ): string {
     const id = Math.floor(Math.random() * 10000)
       .toString()
       .padStart(4, "0");
-    const game = new Game(this.SIZE);
+    const game = new Game(
+      size,
+      board,
+      currentPlayer,
+      gameState,
+      numberOfPlayers,
+    );
 
     this.games.set(id, game);
     this.addGameChangeListenerToGameWebSockedManger(id, game);
-
     return id;
   }
 
