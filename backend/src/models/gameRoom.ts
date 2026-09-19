@@ -1,4 +1,4 @@
-import { Player } from "@tttweb/shared";
+import type { Player } from "@tttweb/shared";
 import { randomUUID } from "crypto";
 import { gameStore } from "./GameStore.ts";
 import type { Board } from "@tttweb/shared";
@@ -9,6 +9,7 @@ export class GameRoom {
   private gameId: string;
   private players: Map<string, Player>;
   private currentSymbol: number = 1; // Start with symbol 1 for the first player
+  private creatorId: string | null = null;
 
   constructor(
     size?: number,
@@ -24,10 +25,15 @@ export class GameRoom {
       GameState.Preparation,
       numberOfPlayers,
     );
+    this.creatorId = randomUUID(); // Generate a unique ID for the creator
   }
 
   getGameId(): string {
     return this.gameId;
+  }
+
+  getCreatorId(): string | null {
+    return this.creatorId;
   }
 
   getGame(): Game {
@@ -69,7 +75,7 @@ export class GameRoom {
     game.gameturn(row, column);
   }
 
-  addPlayerToRoom(roomId: string, playerName: string): string {
+  addPlayerToRoom(playerName: string): string {
     let playerId: string;
     do {
       playerId = randomUUID();

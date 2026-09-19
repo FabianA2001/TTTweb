@@ -1,17 +1,6 @@
 import "./tttField.css";
 import { Board } from "../../../../shared/src/gameLogic/board";
-
-function numberToSymbole(n: number): string {
-  let result = "";
-
-  while (n > 0) {
-    n--;
-    result = String.fromCharCode((n % 26) + 65) + result;
-    n = Math.floor(n / 26);
-  }
-
-  return result;
-}
+import { numberToSymbole } from "@tttweb/shared";
 
 export function renderTicTacToeField(
   board: Board,

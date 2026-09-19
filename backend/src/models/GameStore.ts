@@ -1,6 +1,6 @@
 import { Game } from "@tttweb/shared";
 import { gameWebSocketManager } from "../websocket/gameWebSocketManager.ts";
-import { gameToCompactGame } from "@tttweb/shared";
+import { gameToCompactGame, generateNumberId } from "@tttweb/shared";
 import type { Board, GameState } from "@tttweb/shared";
 
 export class GameStore {
@@ -23,9 +23,6 @@ export class GameStore {
     gameState?: GameState,
     numberOfPlayers?: number,
   ): string {
-    const id = Math.floor(Math.random() * 10000)
-      .toString()
-      .padStart(4, "0");
     const game = new Game(
       size,
       board,
@@ -33,7 +30,10 @@ export class GameStore {
       gameState,
       numberOfPlayers,
     );
-
+    let id: string;
+    do {
+      id = generateNumberId(4);
+    } while (this.games.has(id));
     this.games.set(id, game);
     this.addGameChangeListenerToGameWebSockedManger(id, game);
     return id;

@@ -5,3 +5,4 @@ export * from "./gameLogic/twoPlayerGame.ts";
 export * from "./gameLogic/minMaxSolver.ts";
 export * from "./gameLogic/player.ts";
 export * from "./APITypes/compactGame.ts";
+export * from "./utils/utils.ts";

@@ -2,7 +2,7 @@ import { gameStore } from "./GameStore.ts";
 import { Game } from "@tttweb/shared";
 import { GameRoom } from "./gameRoom.ts";
 import type { Board } from "@tttweb/shared";
-import { randomUUID } from "crypto";
+import { generateNumberId } from "@tttweb/shared";
 
 class GameRoomManager {
   private gameRooms: Map<string, GameRoom> = new Map();
@@ -15,7 +15,7 @@ class GameRoomManager {
   ): string {
     let roomId: string;
     while (true) {
-      roomId = randomUUID();
+      roomId = generateNumberId(5);
       if (!this.gameRooms.has(roomId)) {
         break;
       }
