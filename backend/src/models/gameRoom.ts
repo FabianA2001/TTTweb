@@ -4,6 +4,7 @@ import { gameStore } from "./GameStore.ts";
 import type { Board } from "@tttweb/shared";
 import { GameState } from "@tttweb/shared";
 import type { Game } from "@tttweb/shared";
+import { AppError } from "../middlewares/errorHandler.ts";
 
 export class GameRoom {
   private gameId: string;
@@ -69,7 +70,9 @@ export class GameRoom {
     }
 
     if (game.getCurrentPlayer() !== player.symbol) {
-      throw new Error("It's not this player's turn");
+      const err = new AppError("It's not this player's turn");
+      err.status = 409;
+      throw err;
     }
 
     game.gameturn(row, column);

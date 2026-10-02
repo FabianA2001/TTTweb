@@ -6,4 +6,5 @@ export * from "./gameLogic/minMaxSolver.ts";
 export * from "./gameLogic/player.ts";
 export * from "./APITypes/compactGame.ts";
 export * from "./APITypes/createGameRoomResponse.ts";
+export * from "./APITypes/gameTurnRequest.ts";
 export * from "./utils/utils.ts";

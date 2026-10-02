@@ -9,6 +9,7 @@ export function renderNavbar(): string {
 				<a href="#/tictactoe" data-route-link>Tic Tac Toe</a>
 				<a href="#/api" data-route-link>API</a>
 				<a href="#/ttt-monitor" data-route-link>TTT Monitor</a>
+				<a href="#/ttt-player" data-route-link>TTT Player</a>
 			</nav>
 		</div>
 	</header>

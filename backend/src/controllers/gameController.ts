@@ -23,9 +23,7 @@ export function makeGameRoom(req: Request, res: Response, next: NextFunction) {
       creatorToken,
     };
 
-    res
-      .status(201)
-      .json(response);
+    res.status(201).json(response);
   } catch (error) {
     next(error);
   }
@@ -54,6 +52,7 @@ export function addPlayerToGameRoom(
     const playerId = gameRoom.addPlayerToRoom(playerName);
     const playerToken = generateToken(playerId);
     res.status(200).json({ playerToken: playerToken });
+    console.log(`Player ${playerName} joined game room ${gameRoomId}`);
   } catch (error) {
     next(error);
   }

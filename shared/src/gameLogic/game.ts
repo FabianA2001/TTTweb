@@ -88,10 +88,14 @@ export class Game {
 
   gameturn(row: number, column: number): GameState {
     if (this.gameState !== GameState.InProgress) {
-      throw new Error("Game is not in progress");
+      const err = new Error("Game is not in progress");
+      (err as Error & { status?: number }).status = 409;
+      throw err;
     }
     if (!this.makeMove(row, column)) {
-      throw new Error("Cell is already occupied");
+      const err = new Error("Cell is already occupied");
+      (err as Error & { status?: number }).status = 409;
+      throw err;
     }
     if (this.checkDraw()) {
       this.gameState = GameState.Draw;
