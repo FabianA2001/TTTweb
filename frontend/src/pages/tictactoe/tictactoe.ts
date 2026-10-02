@@ -1,5 +1,5 @@
 import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
-import { GameState, OnePlayerGame, TwoPlayerGame } from "@tttweb/shared";
+import { GameState, OnePlayerGame, TwoPlayerGame, indexToPosition } from "@tttweb/shared";
 import type { Page } from "../page.ts";
 
 let refreshPage: (() => void) | null = null;
@@ -61,16 +61,15 @@ function mouseEventToRowAndColumn(
   if (!Number.isInteger(cellIndex)) {
     return;
   }
+
   const size = game.getSize();
   const cellCount = size * size;
 
-  if (!Number.isInteger(cellIndex) || cellIndex < 0 || cellIndex >= cellCount) {
+  if (cellIndex < 0 || cellIndex >= cellCount) {
     return;
   }
 
-  const row = Math.floor(cellIndex / size);
-  const column = cellIndex % size;
-  return [row, column];
+  return indexToPosition(cellIndex + 1, size);
 }
 
 function handleTicTacToeClick(event: MouseEvent) {

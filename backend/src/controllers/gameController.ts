@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { gameToCompactGame as gameToCompactGame } from "@tttweb/shared";
+import type { createGameRoomResponse } from "@tttweb/shared";
 import { gameRoomManager } from "../models/gameRoomManger.ts";
 import { GameState } from "@tttweb/shared";
 import { generateToken } from "../middlewares/authenticator.ts";
@@ -17,9 +18,14 @@ export function makeGameRoom(req: Request, res: Response, next: NextFunction) {
     const creatorId = gameRoom.getCreatorId();
     const creatorToken = generateToken(creatorId!);
 
+    const response: createGameRoomResponse = {
+      gameRoomId,
+      creatorToken,
+    };
+
     res
       .status(201)
-      .json({ gameRoomId: gameRoomId, creatorToken: creatorToken });
+      .json(response);
   } catch (error) {
     next(error);
   }

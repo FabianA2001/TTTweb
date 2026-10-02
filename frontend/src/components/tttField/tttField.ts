@@ -1,6 +1,6 @@
 import "./tttField.css";
 import { Board } from "../../../../shared/src/gameLogic/board";
-import { numberToSymbole } from "@tttweb/shared";
+import { numberToSymbole,indexToPosition } from "@tttweb/shared";
 
 export function renderTicTacToeField(
   board: Board,
@@ -17,8 +17,7 @@ export function renderTicTacToeField(
     <div class="ttt-field" role="grid" aria-label="TicTacToe board" style="--grid-size: ${size};">
       ${cells
         .map((cell, index) => {
-          const row = Math.floor(index / size);
-          const column = index % size;
+          const [row, column] = indexToPosition(index + 1, size);
           const value = numberToSymbole(cell);
           const marked = board.isMarked(row, column);
           const fieldNumber = index + 1;

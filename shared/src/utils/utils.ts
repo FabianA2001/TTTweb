@@ -15,3 +15,16 @@ export function numberToSymbole(n: number): string {
 
   return result;
 }
+
+export function indexToPosition(index: number, size: number): [number, number] {
+  if (index < 1 || index > size * size) {
+    throw new Error(`Feldnummer muss zwischen 1 und ${size * size} liegen.`);
+  }
+
+  const zeroBasedIndex = index - 1;
+
+  const row = Math.floor(zeroBasedIndex / size);
+  const col = zeroBasedIndex % size;
+
+  return [row, col];
+}

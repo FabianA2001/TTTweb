@@ -19,6 +19,9 @@
     "concurrently": "^9.0.0"
   },
   "dependencies": {
+    "activate": "^0.0.1",
+    "base": "^3.0.0",
+    "conda": "^0.0.1-a17",
     "cors": "^2.8.6",
     "jsonwebtoken": "^9.0.3",
     "ws": "^8.21.3"
