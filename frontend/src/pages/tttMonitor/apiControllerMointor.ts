@@ -1,18 +1,21 @@
-import { Game, compactGameToGame } from "@tttweb/shared";
+import { Game, compactGameToGame} from "@tttweb/shared";
+import type {createGameRoomResponse } from "@tttweb/shared";
 
 const BASE_URL = "http://localhost:3000/api/ttt";
 
-export async function createGame(): Promise<string> {
-  const response = await fetch(BASE_URL + "/create-game", {
+export async function createGame(): Promise<createGameRoomResponse> {
+ const response = await fetch(BASE_URL + "/gameRoom/createGameRoom", {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      size: 3,
+    }),
   });
 
-  if (!response.ok) {
-    throw new Error("Game konnte nicht erstellt werden");
-  }
-
   const data = await response.json();
-  return data.id;
+  return data;
 }
 
 export async function subscribeToSocked(id: string, socket: WebSocket | null) {
@@ -34,12 +37,12 @@ export async function subscribeToSocked(id: string, socket: WebSocket | null) {
 }
 
 export async function getGameState(id: string): Promise<Game> {
-  const response = await fetch(`${BASE_URL}/game/${id}`, {
+  const response = await fetch(`${BASE_URL}/gameRoom/getGame/${id}`, {
     method: "GET",
   });
 
   if (!response.ok) {
-    throw new Error("Game state konnte nicht abgerufen werden");
+    throw new Error(`Fehler beim Abrufen des Spielzustands: ${response.statusText}`);
   }
 
   const data = await response.json();

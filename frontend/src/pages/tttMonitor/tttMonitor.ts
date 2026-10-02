@@ -5,7 +5,7 @@ import {
   createGame,
   subscribeToSocked,
   getGameState,
-} from "./apiController.ts";
+} from "./apiControllerMointor.ts";
 
 let refreshPage: (() => void) | null = null;
 let game: Game | null = null;
@@ -18,7 +18,9 @@ function bindGameModeButtons(root: HTMLElement): void {
     'button[data-game-mode="createGame"]',
   );
   createGameButton?.addEventListener("click", async () => {
-    gameId = await createGame();
+    const data = await createGame();
+    gameId = data.gameRoomId;
+    console.log("Game created with ID:", gameId);
     game = await getGameState(gameId);
     refreshPage?.();
     subscribeToSocked(gameId, socket);
