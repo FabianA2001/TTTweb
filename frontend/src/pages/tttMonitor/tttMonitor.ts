@@ -10,6 +10,8 @@ import {
 let refreshPage: (() => void) | null = null;
 let game: Game | null = null;
 let gameId: string | null = null;
+let creatorToken: string | null = null;
+//TODO implement start button
 let mounted = false;
 let socket: WebSocket | null = null;
 
@@ -19,6 +21,7 @@ function bindGameModeButtons(root: HTMLElement): void {
   );
   createGameButton?.addEventListener("click", async () => {
     const data = await createGame();
+    creatorToken = data.creatorToken;
     gameId = data.gameRoomId;
     console.log("Game created with ID:", gameId);
     game = await getGameState(gameId);
