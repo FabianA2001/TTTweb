@@ -1,10 +1,11 @@
 import { Game, compactGameToGame } from "@tttweb/shared";
 import type { createGameRoomResponse } from "@tttweb/shared";
+import { GAME_ROOM_BASE_URL } from "../../config";
 
-const BASE_URL = "http://localhost:3000/api/ttt";
+const BASE_URL = GAME_ROOM_BASE_URL;
 
 export async function createGame(): Promise<createGameRoomResponse> {
-  const response = await fetch(BASE_URL + "/gameRoom/createGameRoom", {
+  const response = await fetch(BASE_URL + "/createGameRoom", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -37,7 +38,7 @@ export async function subscribeToSocked(id: string, socket: WebSocket | null) {
 }
 
 export async function getGameState(id: string): Promise<Game> {
-  const response = await fetch(`${BASE_URL}/gameRoom/getGame/${id}`, {
+  const response = await fetch(`${BASE_URL}/getGame/${id}`, {
     method: "GET",
   });
 
@@ -55,7 +56,7 @@ export async function startGame(
   id: string,
   creatorToken: string,
 ): Promise<void> {
-  const response = await fetch(`${BASE_URL}/gameRoom/startGameRoom/${id}`, {
+  const response = await fetch(`${BASE_URL}/startGameRoom/${id}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${creatorToken}`,

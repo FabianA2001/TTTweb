@@ -1,6 +1,7 @@
 import type { gameTurnRequest } from "@tttweb/shared";
+import { GAME_ROOM_BASE_URL } from "../../config";
 
-const BASE_URL = "http://localhost:3000/api/ttt/gameRoom";
+const BASE_URL = GAME_ROOM_BASE_URL;
 
 export async function joinGame(
   gameRoomId: string,

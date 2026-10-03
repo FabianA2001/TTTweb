@@ -11,7 +11,12 @@ app.use(
         return callback(null, true);
       }
 
-      if (origin.startsWith("http://localhost:")) {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://192.168.1.105:5173",
+      ];
+
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 

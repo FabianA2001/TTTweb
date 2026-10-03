@@ -1,6 +1,7 @@
 import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
 import { compactGameToGame, Game } from "@tttweb/shared";
 import type { Page } from "../page.ts";
+import { WEBSOCKET_URL } from "../../config";
 import {
   createGame,
   subscribeToSocked,
@@ -100,7 +101,7 @@ export const tttMonitor: Page = {
 
       mounted = true;
 
-      socket = new WebSocket("ws://localhost:3000/ws/game");
+      socket = new WebSocket(WEBSOCKET_URL);
 
       socket.addEventListener("open", () => {
         console.log("Connected to gameWebSocket server");
