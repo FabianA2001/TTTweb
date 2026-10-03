@@ -14,6 +14,12 @@ export async function createGame(): Promise<createGameRoomResponse> {
     }),
   });
 
+  if (!response.ok) {
+    const data = await response.json();
+    console.log(data.message);
+    throw new Error("Failed to create game room: " + data.message);
+  }
+
   const data = await response.json();
   return data;
 }
@@ -24,9 +30,9 @@ export async function getGameState(id: string): Promise<compactGame> {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Fehler beim Abrufen des Spielzustands: ${response.statusText}`,
-    );
+    const data = await response.json();
+    console.log(data.message);
+    throw new Error("Failed to get game state: " + data.message);
   }
 
   const data = await response.json();
@@ -43,8 +49,9 @@ export async function startGame(
       Authorization: `Bearer ${creatorToken}`,
     },
   });
-
   if (!response.ok) {
-    throw new Error(`Fehler beim Starten des Spiels: ${response.statusText}`);
+    const data = await response.json();
+    console.log(data.message);
+    throw new Error("Failed to start game: " + data.message);
   }
 }

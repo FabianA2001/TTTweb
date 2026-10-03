@@ -19,7 +19,9 @@ export async function joinGame(
   );
 
   if (!response.ok) {
-    throw new Error("Failed to join game: " + response.statusText);
+    const data = await response.json();
+    console.log(data.message);
+    throw new Error("Failed to join game: " + data.message);
   }
 
   const data = await response.json();
@@ -32,7 +34,9 @@ export async function getSizeOfGame(gameRoomId: string): Promise<number> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to get game size: " + response.statusText);
+    const data = await response.json();
+    console.log(data.message);
+    throw new Error("Failed to get game size: " + data.message);
   }
 
   const data = await response.json();

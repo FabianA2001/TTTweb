@@ -4,6 +4,7 @@ import type { createGameRoomResponse } from "@tttweb/shared";
 import { gameRoomManager } from "../models/gameRoomManger.ts";
 import { GameState } from "@tttweb/shared";
 import { generateToken } from "../middlewares/authenticator.ts";
+import { AppError } from "../middlewares/errorHandler.ts";
 
 export function makeGameRoom(req: Request, res: Response, next: NextFunction) {
   try {
@@ -37,16 +38,24 @@ export function addPlayerToGameRoom(
   try {
     const { gameRoomId } = req.params;
     if (!gameRoomId || typeof gameRoomId !== "string") {
-      return res.status(400).json({ error: "Game room ID is required" });
+      const err = new AppError("Game Room ID ist erforderlich");
+      err.status = 400;
+      throw err;
     }
     const { playerName } = req.body;
     const gameRoom = gameRoomManager.getGameRoom(gameRoomId);
     if (!gameRoom) {
-      throw new Error("Game room not found");
+      const err = new AppError("Spiel wurde nicht gefunden");
+      err.status = 409;
+      throw err;
     }
 
     if (gameRoom.getGame().getGameState() !== GameState.Preparation) {
-      throw new Error("Cannot join a game that has already started");
+      const err = new AppError(
+        "Spiel hat schon begonnen, Spieler können nicht mehr beitreten",
+      );
+      err.status = 309;
+      throw err;
     }
 
     const playerId = gameRoom.addPlayerToRoom(playerName);
@@ -61,14 +70,20 @@ export function startGameRoom(req: Request, res: Response, next: NextFunction) {
   try {
     const { gameRoomId } = req.params;
     if (!gameRoomId || typeof gameRoomId !== "string") {
-      return res.status(400).json({ error: "Game room ID is required" });
+      const err = new AppError("Game Room ID ist erforderlich");
+      err.status = 400;
+      throw err;
     }
     const gameRoom = gameRoomManager.getGameRoom(gameRoomId);
     if (!gameRoom) {
-      throw new Error("Game room not found");
+      const err = new AppError("Spiel wurde nicht gefunden");
+      err.status = 409;
+      throw err;
     }
     if (gameRoom.getGame().getGameState() !== GameState.Preparation) {
-      throw new Error("can only start a game that is in preparation state");
+      const err = new AppError("Spiel hat schon begonnen");
+      err.status = 309;
+      throw err;
     }
     gameRoom.startGame();
 

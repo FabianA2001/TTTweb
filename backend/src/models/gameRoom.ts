@@ -52,7 +52,9 @@ export class GameRoom {
   getGame(): Game {
     const game = gameStore.getGame(this.gameId);
     if (!game) {
-      throw new Error("Game not found");
+      const err = new AppError("Spiel wurde nicht gefunden");
+      err.status = 409;
+      throw err;
     }
     return game;
   }
@@ -64,7 +66,9 @@ export class GameRoom {
   startGame(): void {
     const game = gameStore.getGame(this.gameId);
     if (!game) {
-      throw new Error("Game not found");
+      const err = new AppError("Spiel wurde nicht gefunden");
+      err.status = 409;
+      throw err;
     }
     game.setNumberOfPlayers(this.players.size);
     game.startGame();
@@ -73,16 +77,20 @@ export class GameRoom {
   gameTurn(row: number, column: number, playerId: string): void {
     const game = gameStore.getGame(this.gameId);
     if (!game) {
-      throw new Error("Game not found");
+      const err = new AppError("Spiel wurde nicht gefunden");
+      err.status = 409;
+      throw err;
     }
 
     const player = this.players.get(playerId);
     if (!player) {
-      throw new Error("Player not found");
+      const err = new AppError("Spieler wurde nicht gefunden");
+      err.status = 409;
+      throw err;
     }
 
     if (game.getCurrentPlayer() !== player.symbol) {
-      const err = new AppError("It's not this player's turn");
+      const err = new AppError("Ein anderer Spieler ist am Zug");
       err.status = 409;
       throw err;
     }
