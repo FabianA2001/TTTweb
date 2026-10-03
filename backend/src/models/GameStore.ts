@@ -6,16 +6,6 @@ import type { Board, GameState } from "@tttweb/shared";
 export class GameStore {
   private games = new Map<string, Game>();
 
-  private addGameChangeListenerToGameWebSockedManger(
-    gameId: string,
-    game: Game,
-  ) {
-    game.subscribe((updatedGame) => {
-      const compactGame = gameToCompactGame(updatedGame);
-      gameWebSocketManager.broadcast(gameId, compactGame);
-    });
-  }
-
   createGame(
     size?: number,
     board?: Board,
@@ -35,7 +25,6 @@ export class GameStore {
       id = generateNumberId(4);
     } while (this.games.has(id));
     this.games.set(id, game);
-    this.addGameChangeListenerToGameWebSockedManger(id, game);
     return id;
   }
 

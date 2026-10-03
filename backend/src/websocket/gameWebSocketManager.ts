@@ -3,21 +3,21 @@ import type { WebSocket } from "ws";
 class GameWebSocketManager {
   private clients = new Map<string, Set<WebSocket>>();
 
-  subscribe(gameId: string, socket: WebSocket) {
-    let clients = this.clients.get(gameId);
+  subscribe(gameRoomId: string, socket: WebSocket) {
+    let clients = this.clients.get(gameRoomId);
 
     if (!clients) {
       clients = new Set();
-      this.clients.set(gameId, clients);
+      this.clients.set(gameRoomId, clients);
     }
 
     clients.add(socket);
 
-    console.log(`Socket subscribed to game ${gameId}`);
+    console.log(`Socket subscribed to game Room ${gameRoomId}`);
   }
 
-  unsubscribe(gameId: string, socket: WebSocket) {
-    const clients = this.clients.get(gameId);
+  unsubscribe(gameRoomId: string, socket: WebSocket) {
+    const clients = this.clients.get(gameRoomId);
 
     if (!clients) {
       return;
@@ -26,12 +26,12 @@ class GameWebSocketManager {
     clients.delete(socket);
 
     if (clients.size === 0) {
-      this.clients.delete(gameId);
+      this.clients.delete(gameRoomId);
     }
   }
 
-  broadcast(gameId: string, message: unknown) {
-    const clients = this.clients.get(gameId);
+  broadcast(gameRoomId: string, message: unknown) {
+    const clients = this.clients.get(gameRoomId);
 
     if (!clients) {
       return;

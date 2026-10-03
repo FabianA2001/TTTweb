@@ -2,7 +2,8 @@ import { gameStore } from "./GameStore.ts";
 import { Game } from "@tttweb/shared";
 import { GameRoom } from "./gameRoom.ts";
 import type { Board } from "@tttweb/shared";
-import { generateNumberId } from "@tttweb/shared";
+import { gameWebSocketManager } from "../websocket/gameWebSocketManager.ts";
+import { gameToCompactGame, generateNumberId } from "@tttweb/shared";
 
 class GameRoomManager {
   private gameRooms: Map<string, GameRoom> = new Map();
@@ -22,7 +23,17 @@ class GameRoomManager {
     }
     const gameRoom = new GameRoom(size, board, currentPlayer, numberOfPlayers);
     this.gameRooms.set(roomId, gameRoom);
+    this.addGameChangeListenerToGameWebSockedManger(roomId, gameRoom.getGame());
     return roomId;
+  }
+  private addGameChangeListenerToGameWebSockedManger(
+    gameRoomId: string,
+    game: Game,
+  ) {
+    game.subscribe((updatedGame) => {
+      const compactGame = gameToCompactGame(updatedGame);
+      gameWebSocketManager.broadcast(gameRoomId, compactGame);
+    });
   }
 
   getGameRoom(roomId: string): GameRoom | undefined {
