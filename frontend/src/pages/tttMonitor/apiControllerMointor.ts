@@ -1,10 +1,10 @@
-import { Game, compactGameToGame} from "@tttweb/shared";
-import type {createGameRoomResponse } from "@tttweb/shared";
+import { Game, compactGameToGame } from "@tttweb/shared";
+import type { createGameRoomResponse } from "@tttweb/shared";
 
 const BASE_URL = "http://localhost:3000/api/ttt";
 
 export async function createGame(): Promise<createGameRoomResponse> {
- const response = await fetch(BASE_URL + "/gameRoom/createGameRoom", {
+  const response = await fetch(BASE_URL + "/gameRoom/createGameRoom", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -42,9 +42,27 @@ export async function getGameState(id: string): Promise<Game> {
   });
 
   if (!response.ok) {
-    throw new Error(`Fehler beim Abrufen des Spielzustands: ${response.statusText}`);
+    throw new Error(
+      `Fehler beim Abrufen des Spielzustands: ${response.statusText}`,
+    );
   }
 
   const data = await response.json();
   return compactGameToGame(data);
+}
+
+export async function startGame(
+  id: string,
+  creatorToken: string,
+): Promise<void> {
+  const response = await fetch(`${BASE_URL}/gameRoom/startGameRoom/${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${creatorToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Fehler beim Starten des Spiels: ${response.statusText}`);
+  }
 }
