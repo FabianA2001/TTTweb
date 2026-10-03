@@ -162,12 +162,6 @@ export const tttPlayer: Page = {
 
               <div class="turn-actions">
                 <h3>Spielzug machen</h3>
-
-                <p>
-                  Gib eine Feldnummer ein.
-                  Das Spielfeld hat ${gameSize} × ${gameSize} Felder.
-                </p>
-
                 <label>
                   Feldnummer:
                   <input

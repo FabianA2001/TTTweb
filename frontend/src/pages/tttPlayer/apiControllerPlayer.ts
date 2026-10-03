@@ -65,6 +65,6 @@ export async function makeTurn(
   if (!response.ok) {
     const data = await response.json();
     console.log(data.message);
-    throw new Error("Failed to make a Turn: " + data.message);
+    throw new Error("Fehler bei dem Spielzug: " + data.message);
   }
 }

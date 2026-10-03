@@ -93,7 +93,7 @@ export class Game {
       throw err;
     }
     if (!this.makeMove(row, column)) {
-      const err = new Error("Cell is already occupied");
+      const err = new Error("Zelle ist bereits besetzt");
       (err as Error & { status?: number }).status = 409;
       throw err;
     }
@@ -108,7 +108,7 @@ export class Game {
 
   private makeMove(row: number, column: number): boolean {
     if (this.board.getCell(row, column) !== 0) {
-      return false; // Cell is already occupied
+      return false;
     }
 
     this.board.setCell(row, column, this.currentPlayer);
