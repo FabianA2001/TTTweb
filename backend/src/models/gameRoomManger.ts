@@ -16,7 +16,7 @@ class GameRoomManager {
   ): string {
     let roomId: string;
     while (true) {
-      roomId = generateNumberId(5);
+      roomId = generateNumberId(2);
       if (!this.gameRooms.has(roomId)) {
         break;
       }
