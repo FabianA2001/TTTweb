@@ -17,21 +17,33 @@ function bindJoinGameButton(root: HTMLElement): void {
   );
 
   joinGameButton?.addEventListener("click", async () => {
-    const input = root.querySelector<HTMLInputElement>('input[name="gameId"]');
+    const gameIdInput = root.querySelector<HTMLInputElement>(
+      'input[name="gameId"]',
+    );
 
-    if (!input || !input.value.trim()) {
+    const nameInput =
+      root.querySelector<HTMLInputElement>('input[name="name"]');
+
+    if (!gameIdInput || !gameIdInput.value.trim()) {
       errorMessage = "Bitte eine Game-ID eingeben.";
       refreshPage?.();
       return;
     }
 
-    const enteredGameId = input.value.trim();
+    if (!nameInput || !nameInput.value.trim()) {
+      errorMessage = "Bitte einen Namen eingeben.";
+      refreshPage?.();
+      return;
+    }
+
+    const enteredGameId = gameIdInput.value.trim();
+    const name = nameInput.value.trim();
 
     errorMessage = null;
     successMessage = null;
 
     try {
-      playerToken = await joinGame(enteredGameId, "TODO");
+      playerToken = await joinGame(enteredGameId, name);
       gameId = enteredGameId;
       gameSize = await getSizeOfGame(enteredGameId);
 
@@ -122,6 +134,20 @@ export const tttPlayer: Page = {
                     style="width: 100%; max-width: 320px;"
                   />
                 </label>
+
+                <br />
+
+                <label>
+                  Name:
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Name eingeben"
+                    style="width: 100%; max-width: 320px;"
+                  />
+                </label>
+
+                <br />
 
                 <button
                   type="button"
