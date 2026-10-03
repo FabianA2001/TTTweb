@@ -1,4 +1,23 @@
 import type { WebSocket } from "ws";
+import type { compactGame } from "@tttweb/shared";
+
+// Hier definierst du deine möglichen WebSocket-Nachrichten.
+// GameState entsprechend durch deinen tatsächlichen Typ ersetzen.
+type GameState = compactGame;
+
+type WebSocketMessages = {
+  game_state: GameState;
+
+  player_joined: {
+    symbol: number;
+    name: string;
+  };
+};
+
+type WebSocketMessage<T> = {
+  type: string;
+  data: T;
+};
 
 class GameWebSocketManager {
   private clients = new Map<string, Set<WebSocket>>();
@@ -30,18 +49,27 @@ class GameWebSocketManager {
     }
   }
 
-  broadcast(gameRoomId: string, message: unknown) {
+  broadcast<K extends keyof WebSocketMessages>(
+    gameRoomId: string,
+    type: K,
+    data: WebSocketMessages[K],
+  ) {
     const clients = this.clients.get(gameRoomId);
 
     if (!clients) {
       return;
     }
 
-    const data = JSON.stringify(message);
+    const message: WebSocketMessage<WebSocketMessages[K]> = {
+      type,
+      data,
+    };
+
+    const serializedMessage = JSON.stringify(message);
 
     for (const socket of clients) {
       if (socket.readyState === socket.OPEN) {
-        socket.send(data);
+        socket.send(serializedMessage);
       }
     }
   }

@@ -1,69 +1,72 @@
-import { Game, compactGameToGame } from "@tttweb/shared";
-import type { createGameRoomResponse } from "@tttweb/shared";
-import { GAME_ROOM_BASE_URL } from "../../config";
+import {
+  clearMonitorPlayers,
+  getCreatorToken,
+  getGameId,
+  getMonitorState as readMonitorState,
+  setCreatorToken,
+  setGameId,
+  setMonitorGame,
+  setMonitorGameStatus,
+  monitorRefresh,
+  setMonitorRefresh,
+} from "./tttMonitorState";
+import { createGame, getGameState, startGame } from "./tttMonitorApi";
+import {
+  mountMonitorWebSocket,
+  subscribeToSocket,
+} from "./tttMonitorWebsocket";
 
-const BASE_URL = GAME_ROOM_BASE_URL;
-
-export async function createGame(): Promise<createGameRoomResponse> {
-  const response = await fetch(BASE_URL + "/createGameRoom", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      size: 3,
-    }),
-  });
-
-  const data = await response.json();
-  return data;
-}
-
-export async function subscribeToSocked(id: string, socket: WebSocket | null) {
-  if (!socket) {
-    throw new Error("WebSocket ist nicht verbunden");
-  }
-
-  if (socket.readyState !== WebSocket.OPEN) {
-    console.warn("WebSocket ist noch nicht verbunden");
-    return;
-  }
-
-  socket.send(
-    JSON.stringify({
-      type: "subscribe",
-      gameId: id,
-    }),
+function bindGameModeButtons(root: HTMLElement): void {
+  const createGameButton = root.querySelector<HTMLButtonElement>(
+    'button[data-game-mode="createGame"]',
   );
-}
 
-export async function getGameState(id: string): Promise<Game> {
-  const response = await fetch(`${BASE_URL}/getGame/${id}`, {
-    method: "GET",
+  createGameButton?.addEventListener("click", async () => {
+    const data = await createGame();
+
+    setCreatorToken(data.creatorToken);
+    setGameId(data.gameRoomId);
+    clearMonitorPlayers();
+
+    console.log("Game created with ID:", data.gameRoomId);
+
+    if (data.gameRoomId) {
+      setMonitorGame(await getGameState(data.gameRoomId));
+      void subscribeToSocket(data.gameRoomId);
+    }
+    monitorRefresh();
   });
 
-  if (!response.ok) {
-    throw new Error(
-      `Fehler beim Abrufen des Spielzustands: ${response.statusText}`,
-    );
-  }
+  const startGameButton = root.querySelector<HTMLButtonElement>(
+    'button[data-game-action="startGame"]',
+  );
 
-  const data = await response.json();
-  return compactGameToGame(data);
+  startGameButton?.addEventListener("click", async () => {
+    const currentGameId = getGameId();
+    const creatorToken = getCreatorToken();
+
+    if (!currentGameId || !creatorToken) {
+      console.error("Game ID or creator token is missing");
+      return;
+    }
+
+    try {
+      await startGame(currentGameId, creatorToken);
+      console.log("Game started");
+      setMonitorGameStatus(1);
+    } catch (error) {
+      console.error("Failed to start game:", error);
+    }
+    monitorRefresh();
+  });
 }
 
-export async function startGame(
-  id: string,
-  creatorToken: string,
-): Promise<void> {
-  const response = await fetch(`${BASE_URL}/startGameRoom/${id}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${creatorToken}`,
-    },
-  });
+export function mountMonitorPage(root: HTMLElement, refresh: () => void): void {
+  setMonitorRefresh(refresh);
+  mountMonitorWebSocket();
+  bindGameModeButtons(root);
+}
 
-  if (!response.ok) {
-    throw new Error(`Fehler beim Starten des Spiels: ${response.statusText}`);
-  }
+export function getMonitorState() {
+  return readMonitorState();
 }

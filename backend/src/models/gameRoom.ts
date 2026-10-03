@@ -6,11 +6,14 @@ import { GameState } from "@tttweb/shared";
 import type { Game } from "@tttweb/shared";
 import { AppError } from "../middlewares/errorHandler.ts";
 
+export type PlayerJoinedListener = (player: Player) => void;
+
 export class GameRoom {
   private gameId: string;
   private players: Map<string, Player>;
   private currentSymbol: number = 1; // Start with symbol 1 for the first player
   private creatorId: string | null = null;
+  private listeners = new Set<PlayerJoinedListener>();
 
   constructor(
     size?: number,
@@ -27,6 +30,15 @@ export class GameRoom {
       numberOfPlayers,
     );
     this.creatorId = randomUUID(); // Generate a unique ID for the creator
+  }
+
+  subscribe(listener: PlayerJoinedListener): () => void {
+    this.listeners.add(listener);
+
+    // Funktion zum Abmelden zurückgeben
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   getGameId(): string {
@@ -90,6 +102,12 @@ export class GameRoom {
     };
     this.currentSymbol++; // Increment symbol for the next player
     this.players.set(playerId, player);
+
+    // Notify all listeners about the new player
+    for (const listener of this.listeners) {
+      listener(player);
+    }
+
     return playerId;
   }
 }

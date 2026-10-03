@@ -24,6 +24,7 @@ class GameRoomManager {
     const gameRoom = new GameRoom(size, board, currentPlayer, numberOfPlayers);
     this.gameRooms.set(roomId, gameRoom);
     this.addGameChangeListenerToGameWebSockedManger(roomId, gameRoom.getGame());
+    this.addPlayerJoinedListenerToGameWebSockedManger(roomId);
     return roomId;
   }
   private addGameChangeListenerToGameWebSockedManger(
@@ -32,7 +33,21 @@ class GameRoomManager {
   ) {
     game.subscribe((updatedGame) => {
       const compactGame = gameToCompactGame(updatedGame);
-      gameWebSocketManager.broadcast(gameRoomId, compactGame);
+      gameWebSocketManager.broadcast(gameRoomId, "game_state", compactGame);
+    });
+  }
+
+  private addPlayerJoinedListenerToGameWebSockedManger(gameRoomId: string) {
+    const gameRoom = this.gameRooms.get(gameRoomId);
+    if (!gameRoom) {
+      throw new Error("Game room not found");
+    }
+
+    gameRoom.subscribe((player) => {
+      gameWebSocketManager.broadcast(gameRoomId, "player_joined", {
+        symbol: player.symbol,
+        name: player.name,
+      });
     });
   }
 
