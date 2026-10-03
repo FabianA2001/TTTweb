@@ -31,6 +31,10 @@ Ein Beispiel für den Ablauf des TTT Monitors:
 
 ![TTT Monitor](readme_data/TTTMonitor.png)
 
+### TTT Player
+
+Der TTT Player ist eine eigene Seite, mit der ein Spieler einem bereits laufenden TTT-Monitor-Spiel beitreten kann. Dazu wird die Game-ID eingegeben, anschließend erhält der Spieler ein eigenes Token und kann seine Züge über die API an das Backend senden. Die Authentifizierung erfolgt über diesen Token, sodass jeder Spieler nur für sich selbst spielen kann und nicht als anderer Teilnehmer agieren kann. So kann ein Spieler an einem auf dem Server verwalteten Spiel teilnehmen, ohne selbst das Spiel lokal zu verwalten.
+
 ## Architektur
 
 ```text
@@ -82,4 +86,10 @@ npm run dev:frontend
 npm run dev:backend
 ```
 
-Das Backend läuft standardmäßig auf Port `3000`. Das Frontend wird von Vite bereitgestellt und zeigt die lokale Entwicklungs-URL im Terminal an.
+Wichtig: In `frontend/src/config.ts` muss die Backend-Adresse in `SERVER_HOST` eingetragen werden, damit die API- und WebSocket-Anfragen an die richtige IP/URL gehen. Beispiel:
+
+```ts
+export const SERVER_HOST = "192.168.1.109:3000";
+```
+
+Wenn das Backend lokal läuft, kann auch `localhost:3000` verwendet werden. Das Backend läuft standardmäßig auf Port `3000`. Das Frontend wird von Vite bereitgestellt und zeigt die lokale Entwicklungs-URL im Terminal an.
