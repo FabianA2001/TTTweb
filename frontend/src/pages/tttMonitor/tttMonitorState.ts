@@ -1,4 +1,5 @@
 import type { compactGame, Player, GameState } from "@tttweb/shared";
+import { numberToSymbole } from "@tttweb/shared";
 
 type MonitorViewModel = {
   gameId: string | null;
@@ -93,7 +94,9 @@ export function getMonitorState(): MonitorViewModel {
   const playerList =
     joinedPlayers.length > 0
       ? joinedPlayers
-          .map((player) => `• ${player.name} (S${player.symbol})`)
+          .map(
+            (player) => `• ${player.name} (${numberToSymbole(player.symbol)})`,
+          )
           .join("<br>")
       : "Keine Spieler beigetreten";
 
