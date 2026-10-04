@@ -1,6 +1,12 @@
-import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
-import { GameState, OnePlayerGame, TwoPlayerGame, indexToPosition } from "@tttweb/shared";
+import { renderTicTacToeFieldFromBoard } from "../../components/tttField/tttField.ts";
+import {
+  GameState,
+  OnePlayerGame,
+  TwoPlayerGame,
+  indexToPosition,
+} from "@tttweb/shared";
 import type { Page } from "../page.ts";
+import "./tictactoe.css";
 
 let refreshPage: (() => void) | null = null;
 let gameState: GameState = GameState.InProgress;
@@ -73,6 +79,9 @@ function mouseEventToRowAndColumn(
 }
 
 function handleTicTacToeClick(event: MouseEvent) {
+  if (gameState === GameState.Winner || gameState === GameState.Draw) {
+    return;
+  }
   if (gameState !== GameState.InProgress) {
     alert("Das Spiel ist vorbei. Bitte starte ein neues Spiel.");
     return;
@@ -94,7 +103,7 @@ export const ticTacToe: Page = {
           <button type="button" data-game-mode="two-player">2 Spieler</button>
         </div>
         <p>Klicke auf ein Feld, um den State zu ändern und die Seite neu zu rendern.</p>
-        ${renderTicTacToeField(game.getBoard())}
+        ${renderTicTacToeFieldFromBoard(game.getBoard())}
       </section>
     `;
   },
