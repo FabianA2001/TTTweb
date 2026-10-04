@@ -28,3 +28,12 @@ export function indexToPosition(index: number, size: number): [number, number] {
 
   return [row, col];
 }
+
+// Schutz davor, dass Namen oder IDs als HTML interpretiert werden
+export const escapeHtml = (value: unknown): string =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");

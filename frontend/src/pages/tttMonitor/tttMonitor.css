@@ -1,14 +1,49 @@
-.monitor-page__layout {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
-  gap: 1.5rem;
+/* Monitor-Seite: füllt die verfügbare Höhe, die Seite selbst scrollt nicht.
+   Alle Overrides für das Board sind auf .monitor-page__board begrenzt,
+   damit andere Seiten mit .ttt-field unverändert bleiben. */
+
+.tic-tac-toe-page.monitor-page {
+  /* Platz, den Navbar und Seitenrand über und unter dieser Seite belegen.
+     Der Wert hier ist nur ein Startwert (Navbar ca. 4,6 rem + Seitenrand 5 rem);
+     tttMonitor.ts misst den echten Wert und überschreibt ihn. */
+  --monitor-page-offset: 9.75rem;
+
+  --monitor-h: calc(100dvh - var(--monitor-page-offset));
+  --monitor-gap: 1.25rem;
+  --monitor-panel-w: clamp(13rem, 22vw, 20rem);
+
+  /* Das Board ist quadratisch und so groß, wie Höhe und Breite es zulassen */
+  --board-size: min(
+    var(--monitor-h),
+    calc(100vw - 2 * var(--monitor-panel-w) - 2 * var(--monitor-gap) - 2.5rem)
+  );
+
+  width: 100%;
+  height: var(--monitor-h);
   align-items: stretch;
+  text-align: left;
 }
 
+.monitor-page__layout {
+  display: grid;
+  grid-template-columns: var(--monitor-panel-w) var(--board-size) var(
+      --monitor-panel-w
+    );
+  grid-template-rows: minmax(0, 1fr);
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--monitor-gap);
+  width: 100%;
+  height: 100%;
+}
+
+/* Seitenpanels */
 .monitor-page__panel {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-height: 0;
+  overflow-y: auto;
   padding: 0.75rem;
   border: 1px solid #dfe7ff;
   border-radius: 0.95rem;
@@ -35,6 +70,32 @@
   background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
 }
 
+.monitor-page__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.monitor-page__value {
+  color: #1e293b;
+  overflow-wrap: anywhere;
+}
+
+.monitor-page__input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 0.6rem;
+  background: #fff;
+  color: #1e293b;
+  font: inherit;
+}
+
+.monitor-page__input:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 1px;
+}
+
 .monitor-page__players {
   display: flex;
   flex-direction: column;
@@ -59,29 +120,86 @@
   font-style: italic;
 }
 
-.monitor-page__actions {
+.monitor-page .monitor-page__actions {
   margin-top: auto;
+  margin-bottom: 0;
   padding-top: 0.5rem;
   justify-content: flex-start;
 }
 
+/* Board: feste quadratische Fläche, Zellen skalieren mit */
 .monitor-page__board {
+  container-type: size;
+  width: var(--board-size);
+  height: var(--board-size);
   display: grid;
+  place-items: stretch;
+  min-height: 0;
+}
+
+.monitor-page__board:empty {
+  border: 2px dashed #c7d2fe;
+  border-radius: 1rem;
   place-items: center;
-  padding: 0.5rem 0 1rem;
+  color: #64748b;
 }
 
-.monitor-page__board > * {
-  margin-inline: auto;
+.monitor-page__board:empty::after {
+  content: "Noch kein Spiel";
 }
 
-/* Auf schmalen Screens untereinander: Board zuerst, dann Infos, dann Spieler */
-@media (max-width: 900px) {
+.monitor-page__board .ttt-field {
+  --monitor-cell: calc(100cqmin / var(--grid-size, 3));
+
+  width: 100%;
+  height: 100%;
+  padding: clamp(0.25rem, 1.2cqmin, 0.75rem);
+  gap: clamp(2px, 0.8cqmin, 0.5rem);
+  grid-template-columns: repeat(var(--grid-size, 3), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--grid-size, 3), minmax(0, 1fr));
+}
+
+.monitor-page__board .ttt-field__cell {
+  aspect-ratio: auto;
+  min-width: 0;
+  min-height: 0;
+  border-radius: clamp(0.25rem, 0.15 * var(--monitor-cell), 0.75rem);
+  font-size: calc(var(--monitor-cell) * 0.5);
+}
+
+.monitor-page__board .ttt-field__number {
+  font-size: calc(var(--monitor-cell) * 0.36);
+}
+
+/* Hochkant (Handy): Board oben, Infos und Spieler nebeneinander darunter */
+@media (max-aspect-ratio: 1/1), (max-width: 700px) {
+  .tic-tac-toe-page.monitor-page {
+    --monitor-gap: 0.75rem;
+    --board-size: min(calc(100vw - 2.5rem), calc(var(--monitor-h) * 0.55));
+  }
+
   .monitor-page__layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: var(--board-size) minmax(0, 1fr);
   }
 
   .monitor-page__board {
+    grid-column: 1 / -1;
     order: -1;
+    justify-self: center;
+  }
+
+  .monitor-page__panel {
+    gap: 0.4rem;
+    padding: 0.5rem;
+  }
+
+  .monitor-page__info {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .monitor-page__player {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.9rem;
   }
 }

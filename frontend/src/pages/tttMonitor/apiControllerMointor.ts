@@ -16,15 +16,20 @@ import {
   subscribeToSocket,
 } from "./tttMonitorWebsocket";
 
+import { MAX_GAME_SIZE, MIN_GAME_SIZE } from "./const";
+
 function getSelectedGameSize(root: HTMLElement): number {
   const sizeInput = root.querySelector<HTMLInputElement>("[data-game-size]");
-  const parsedSize = Number.parseInt(sizeInput?.value ?? "3", 10);
+  const parsedSize = Number.parseInt(
+    sizeInput?.value ?? MIN_GAME_SIZE.toString(),
+    MAX_GAME_SIZE,
+  );
 
-  if (!Number.isInteger(parsedSize) || parsedSize < 3) {
-    return 3;
+  if (!Number.isInteger(parsedSize) || parsedSize < MIN_GAME_SIZE) {
+    return MIN_GAME_SIZE;
   }
 
-  return Math.min(parsedSize, 10);
+  return Math.min(parsedSize, MAX_GAME_SIZE);
 }
 
 function bindGameModeButtons(root: HTMLElement): void {
