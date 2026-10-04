@@ -22,7 +22,6 @@ function getSelectedGameSize(root: HTMLElement): number {
   const sizeInput = root.querySelector<HTMLInputElement>("[data-game-size]");
   const parsedSize = Number.parseInt(
     sizeInput?.value ?? MIN_GAME_SIZE.toString(),
-    MAX_GAME_SIZE,
   );
 
   if (!Number.isInteger(parsedSize) || parsedSize < MIN_GAME_SIZE) {
