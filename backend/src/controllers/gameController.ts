@@ -54,7 +54,7 @@ export function addPlayerToGameRoom(
       const err = new AppError(
         "Spiel hat schon begonnen, Spieler können nicht mehr beitreten",
       );
-      err.status = 309;
+      err.status = 409;
       throw err;
     }
 
@@ -82,7 +82,7 @@ export function startGameRoom(req: Request, res: Response, next: NextFunction) {
     }
     if (gameRoom.getGame().getGameState() !== GameState.Preparation) {
       const err = new AppError("Spiel hat schon begonnen");
-      err.status = 309;
+      err.status = 409;
       throw err;
     }
     gameRoom.startGame();

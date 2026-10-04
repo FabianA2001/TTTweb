@@ -88,7 +88,7 @@ export class Game {
 
   gameturn(row: number, column: number): GameState {
     if (this.gameState !== GameState.InProgress) {
-      const err = new Error("Game is not in progress");
+      const err = new Error("Das Spiel ist nicht im Gange");
       (err as Error & { status?: number }).status = 409;
       throw err;
     }
