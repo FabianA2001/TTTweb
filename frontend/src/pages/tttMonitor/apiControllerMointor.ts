@@ -16,13 +16,25 @@ import {
   subscribeToSocket,
 } from "./tttMonitorWebsocket";
 
+function getSelectedGameSize(root: HTMLElement): number {
+  const sizeInput = root.querySelector<HTMLInputElement>("[data-game-size]");
+  const parsedSize = Number.parseInt(sizeInput?.value ?? "3", 10);
+
+  if (!Number.isInteger(parsedSize) || parsedSize < 3) {
+    return 3;
+  }
+
+  return Math.min(parsedSize, 10);
+}
+
 function bindGameModeButtons(root: HTMLElement): void {
   const createGameButton = root.querySelector<HTMLButtonElement>(
     'button[data-game-mode="createGame"]',
   );
 
   createGameButton?.addEventListener("click", async () => {
-    const data = await createGame();
+    const size = getSelectedGameSize(root);
+    const data = await createGame(size);
 
     setCreatorToken(data.creatorToken);
     setGameId(data.gameRoomId);

@@ -28,8 +28,8 @@ export const tttMonitor: Page = {
         <h1>Tic Tac Toe</h1>
       </div>
 
-      <div class="monitor-page__overview">
-        <section class="monitor-page__panel" aria-label="Spielinformationen">
+      <div class="monitor-page__layout">
+        <section class="monitor-page__panel monitor-page__panel--info" aria-label="Spielinformationen">
           <h2 class="monitor-page__panel-title">Spielinfos</h2>
 
           <div class="monitor-page__info">
@@ -45,6 +45,19 @@ export const tttMonitor: Page = {
           <div class="monitor-page__info">
             <span class="monitor-page__label">Aktiver Player</span>
             <span>${monitorState.activePlayerName || "–"}</span>
+          </div>
+
+          <div class="monitor-page__info">
+            <label class="monitor-page__label" for="monitor-game-size">Boardgröße</label>
+            <input
+              id="monitor-game-size"
+              type="number"
+              min="3"
+              max="10"
+              step="1"
+              value="10"
+              data-game-size
+            />
           </div>
 
           <div class="game-mode-actions monitor-page__actions">
@@ -64,19 +77,17 @@ export const tttMonitor: Page = {
           </div>
         </section>
 
-        <section class="monitor-page__panel" aria-label="Spieler">
+        <div class="monitor-page__board">
+          ${monitorState.board ? renderTicTacToeField(monitorState.board, [], true) : ""}
+        </div>
+
+        <section class="monitor-page__panel monitor-page__panel--players" aria-label="Spieler">
           <h2 class="monitor-page__panel-title">Aktive Player</h2>
 
           <ul class="monitor-page__players">
             ${renderPlayers(monitorState.playerList)}
           </ul>
         </section>
-      </div>
-
-      <div class="monitor-page__separator" aria-hidden="true"></div>
-
-      <div class="monitor-page__board">
-        ${monitorState.board ? renderTicTacToeField(monitorState.board, [], true) : ""}
       </div>
     </section>
   `;

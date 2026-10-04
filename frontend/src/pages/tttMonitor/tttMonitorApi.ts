@@ -3,14 +3,16 @@ import { GAME_ROOM_BASE_URL } from "../../config";
 
 const BASE_URL = GAME_ROOM_BASE_URL;
 
-export async function createGame(): Promise<createGameRoomResponse> {
+export async function createGame(
+  size: number,
+): Promise<createGameRoomResponse> {
   const response = await fetch(BASE_URL + "/createGameRoom", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      size: 3,
+      size: size,
     }),
   });
 

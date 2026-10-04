@@ -1,7 +1,7 @@
-.monitor-page__overview {
+.monitor-page__layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1rem;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+  gap: 1.5rem;
   align-items: stretch;
 }
 
@@ -59,12 +59,6 @@
   font-style: italic;
 }
 
-@media (max-width: 700px) {
-  .monitor-page__overview {
-    grid-template-columns: 1fr;
-  }
-}
-
 .monitor-page__actions {
   margin-top: auto;
   padding-top: 0.5rem;
@@ -74,10 +68,20 @@
 .monitor-page__board {
   display: grid;
   place-items: center;
-  width: 100%;
   padding: 0.5rem 0 1rem;
 }
 
 .monitor-page__board > * {
   margin-inline: auto;
+}
+
+/* Auf schmalen Screens untereinander: Board zuerst, dann Infos, dann Spieler */
+@media (max-width: 900px) {
+  .monitor-page__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .monitor-page__board {
+    order: -1;
+  }
 }
