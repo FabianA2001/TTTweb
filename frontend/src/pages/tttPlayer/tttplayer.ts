@@ -1,15 +1,27 @@
 import { joinGame, makeTurn, getSizeOfGame } from "./apiControllerPlayer.ts";
 import { indexToPosition } from "@tttweb/shared";
 import type { Page } from "../page.ts";
+import "./tttPlayer.css";
 
 let refreshPage: (() => void) | null = null;
 
 let gameId: string | null = null;
 let playerToken: string | null = null;
+let playerName: string | null = null;
 let gameSize: number | null = null;
 
 let errorMessage: string | null = null;
 let successMessage: string | null = null;
+
+// Schutz davor, dass Eingaben oder Fehlertexte als HTML interpretiert werden
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
 
 function bindJoinGameButton(root: HTMLElement): void {
   const joinGameButton = root.querySelector<HTMLButtonElement>(
@@ -45,12 +57,14 @@ function bindJoinGameButton(root: HTMLElement): void {
     try {
       playerToken = await joinGame(enteredGameId, name);
       gameId = enteredGameId;
+      playerName = name;
       gameSize = await getSizeOfGame(enteredGameId);
 
       successMessage = "Du bist dem Spiel beigetreten.";
     } catch (error) {
       gameId = null;
       playerToken = null;
+      playerName = null;
       gameSize = null;
 
       errorMessage =
@@ -116,81 +130,94 @@ function bindTurnButton(root: HTMLElement): void {
 export const tttPlayer: Page = {
   render: () => {
     return `
-      <section class="tic-tac-toe-page">
-        <h1>Tic Tac Toe</h1>
+      <section class="ttt-player-page">
+        <header class="ttt-player-header">
+          <h1>Tic Tac Toe</h1>
+        </header>
 
-        ${
-          !gameId
-            ? `
-              <div class="game-mode-actions">
-                <h2>Spiel beitreten</h2>
+        <div class="ttt-player-card">
+          ${
+            !gameId
+              ? `
+                <div class="ttt-player-form">
+                  <h2>Spiel beitreten</h2>
 
-                <label>
-                  Game-ID:
-                  <input
-                    type="text"
-                    name="gameId"
-                    placeholder="Game-ID eingeben"
-                    style="width: 100%; max-width: 320px;"
-                  />
-                </label>
+                  <label class="ttt-player-field">
+                    <span class="ttt-player-field-label">Game-ID</span>
+                    <input
+                      class="ttt-player-input"
+                      type="text"
+                      name="gameId"
+                      placeholder="Game-ID eingeben"
+                      autocomplete="off"
+                    />
+                  </label>
 
-                <br />
+                  <label class="ttt-player-field">
+                    <span class="ttt-player-field-label">Name</span>
+                    <input
+                      class="ttt-player-input"
+                      type="text"
+                      name="name"
+                      placeholder="Name eingeben"
+                      autocomplete="nickname"
+                    />
+                  </label>
 
-                <label>
-                  Name:
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Name eingeben"
-                    style="width: 100%; max-width: 320px;"
-                  />
-                </label>
+                  <button type="button" data-game-mode="joinGame">
+                    Spiel beitreten
+                  </button>
+                </div>
+              `
+              : `
+                <div class="ttt-player-game-id">
+                  <div class="ttt-player-game-id-row">
+                    <span class="ttt-player-game-id-label">Spieler</span>
+                    <span class="ttt-player-name-value">${escapeHtml(playerName ?? "")}</span>
+                  </div>
+                  <div class="ttt-player-game-id-row">
+                    <span class="ttt-player-game-id-label">Game-ID</span>
+                    <span class="ttt-player-game-id-value">${escapeHtml(gameId)}</span>
+                  </div>
+                </div>
 
-                <br />
+                <div class="ttt-player-form">
+                  <h2>Spielzug machen</h2>
 
-                <button
-                  type="button"
-                  data-game-mode="joinGame"
-                >
-                  Spiel beitreten
-                </button>
-              </div>
-            `
-            : `
-              <h2>Game Id: ${gameId}</h2>
+                  <label class="ttt-player-field">
+                    <span class="ttt-player-field-label">Feldnummer</span>
+                    <input
+                      class="ttt-player-input ttt-player-input--number"
+                      type="number"
+                      name="fieldNumber"
+                      min="1"
+                      max="${gameSize! * gameSize!}"
+                      placeholder="1"
+                      inputmode="numeric"
+                    />
+                  </label>
 
-              <div class="turn-actions">
-                <h3>Spielzug machen</h3>
-                <label>
-                  Feldnummer:
-                  <input
-                    type="number"
-                    name="fieldNumber"
-                    min="1"
-                    max="${gameSize! * gameSize!}"
-                    placeholder="Feldnummer"
-                    style="width: 100%; max-width: 120px;"
-                  />
-                </label>
+                  <p class="ttt-player-hint">Felder von 1 bis ${gameSize! * gameSize!}</p>
 
-                <button
-                  type="button"
-                  data-action="makeTurn"
-                >
-                  Spielzug machen
-                </button>
-              </div>
-            `
-        }
+                  <button type="button" data-action="makeTurn">
+                    Spielzug machen
+                  </button>
+                </div>
+              `
+          }
 
-        ${
-          successMessage
-            ? `<p class="success-message">${successMessage}</p>`
-            : ""
-        }
+          ${
+            successMessage
+              ? `<p class="ttt-player-message ttt-player-message--success" role="status">${escapeHtml(successMessage)}</p>`
+              : ""
+          }
 
-        ${errorMessage ? `<p class="error-message">${errorMessage}</p>` : ""}
+          ${
+            errorMessage
+              ? `<p class="ttt-player-message ttt-player-message--error" role="alert">${escapeHtml(errorMessage)}</p>`
+              : ""
+          }
+        </div>
       </section>
     `;
   },

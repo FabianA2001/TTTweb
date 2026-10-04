@@ -1,0 +1,194 @@
+/* Tic Tac Toe – Spieler-Seite
+   Baut auf den globalen Variablen und dem globalen button-Style auf. */
+
+.ttt-player-page {
+  --ttt-player-ink: #1e293b;
+  --ttt-player-muted: #64748b;
+  --ttt-player-line: #c7d2fe;
+  --ttt-player-accent: #4f46e5;
+  --ttt-player-accent-soft: #eef2ff;
+  --ttt-player-ok-bg: #ecfdf5;
+  --ttt-player-ok-line: #6ee7b7;
+  --ttt-player-ok-text: #065f46;
+  --ttt-player-err-bg: #fef2f2;
+  --ttt-player-err-line: #fca5a5;
+  --ttt-player-err-text: #991b1b;
+
+  max-width: 30rem;
+  margin: 0 auto;
+}
+
+/* Titel */
+.ttt-player-header {
+  margin-bottom: 1.5rem;
+}
+
+.ttt-player-header h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Karte */
+.ttt-player-card {
+  padding: 1.5rem;
+  border: 1px solid var(--ttt-player-line);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.ttt-player-card h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  color: var(--ttt-player-ink);
+}
+
+/* Formularfelder */
+.ttt-player-field {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.ttt-player-field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ttt-player-ink);
+}
+
+.ttt-player-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--ttt-player-line);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--ttt-player-ink);
+  font: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ttt-player-input::placeholder {
+  color: #94a3b8;
+}
+
+.ttt-player-input:hover {
+  border-color: var(--btn-border-hover);
+}
+
+.ttt-player-input:focus-visible {
+  outline: none;
+  border-color: var(--ttt-player-accent);
+  box-shadow: 0 0 0 3px var(--btn-focus);
+}
+
+.ttt-player-card button {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Spielername und Game-ID als Ticket */
+.ttt-player-game-id {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--ttt-player-accent);
+  border-radius: 0.75rem;
+  background: var(--ttt-player-accent-soft);
+}
+
+.ttt-player-game-id-label {
+  font-size: 0.85rem;
+  color: var(--ttt-player-muted);
+}
+
+.ttt-player-game-id-value {
+  min-width: 0;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ttt-player-accent);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+/* Zugfeld: große Zahl, weil hier die eigentliche Aktion passiert */
+.ttt-player-input--number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.ttt-player-hint {
+  margin: -0.5rem 0 1rem;
+  font-size: 0.85rem;
+  color: var(--ttt-player-muted);
+}
+
+/* Rückmeldungen */
+.ttt-player-message {
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.ttt-player-message--success {
+  border-color: var(--ttt-player-ok-line);
+  background: var(--ttt-player-ok-bg);
+  color: var(--ttt-player-ok-text);
+}
+
+.ttt-player-message--error {
+  border-color: var(--ttt-player-err-line);
+  background: var(--ttt-player-err-bg);
+  color: var(--ttt-player-err-text);
+}
+
+/* Die kleine Einblendung der Rückmeldung zeigt, dass sich etwas geändert hat */
+@media (prefers-reduced-motion: no-preference) {
+  .ttt-player-message {
+    animation: ttt-player-message-in 0.2s ease-out;
+  }
+
+  @keyframes ttt-player-message-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .ttt-player-card {
+    padding: 1.15rem;
+  }
+}
+
+.ttt-player-form {
+  display: block;
+}
+
+.ttt-player-game-id-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ttt-player-name-value {
+  min-width: 0;
+  font-weight: 700;
+  color: var(--ttt-player-ink);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
