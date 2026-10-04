@@ -8,6 +8,7 @@ type MonitorViewModel = {
   currentGameState: string;
   showStartButton: boolean;
   board: number[] | null;
+  markedCells: boolean[] | null;
 };
 
 let refreshPage: (() => void) | null = null;
@@ -111,5 +112,6 @@ export function getMonitorState(): MonitorViewModel {
       : "Noch kein Spiel geladen",
     showStartButton: Boolean(gameId && game?.status === 0),
     board: game?.board ?? null,
+    markedCells: game?.markedCells ?? null,
   };
 }

@@ -3,9 +3,12 @@ import { numberToSymbole, indexToPosition } from "@tttweb/shared";
 
 export function renderTicTacToeField(
   cells: number[],
-  markedCells: boolean[] = [],
+  markedCells: boolean[] | null = [],
   showFieldNumbers = false,
 ): string {
+  if (markedCells === null) {
+    markedCells = [];
+  }
   if (markedCells.length !== 0 && markedCells.length !== cells.length) {
     throw new Error(
       `renderTicTacToeField: cells and markedCells must have the same length. Received ${cells.length} and ${markedCells.length}.`,

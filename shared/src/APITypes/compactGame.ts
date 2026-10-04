@@ -6,6 +6,8 @@ export interface compactGame {
   size: number;
   // A flat array representing the board state (0 for empty, 1 for player cross, 2 for player circle)
   board: Array<number>;
+  // An array representing which cells are marked (true for marked, false for unmarked)
+  markedCells: Array<boolean>;
   // The current player represented as a number
   aktivePlayer: number;
   // Gamestatus (0 for in progress, 1 for draw, 2 for player cross wins, 3 for player circle wins)
@@ -23,6 +25,7 @@ export function compactGameToGame(compact: compactGame): Game {
     const row = Math.floor(i / compact.size);
     const col = i % compact.size;
     board.setCell(row, col, compact.board[i]);
+    board.setMark(row, col, compact.markedCells[i]);
   }
 
   return new Game(compact.size, board, compact.aktivePlayer, compact.status);
@@ -36,9 +39,16 @@ export function gameToCompactGame(game: Game): compactGame {
       board.push(game.getBoard().getCell(row, col));
     }
   }
+  const markedCells: Array<boolean> = [];
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      markedCells.push(game.getBoard().isMarked(row, col));
+    }
+  }
   return {
     size: size,
     board: board,
+    markedCells: markedCells,
     aktivePlayer: game.getCurrentPlayer(),
     status: game.getGameState(),
   };
