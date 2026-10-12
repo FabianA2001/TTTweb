@@ -30,8 +30,7 @@ export class Game {
     winLength?: number,
   ) {
     this.size = size ?? 3;
-    // this.winLength = winLength ?? this.size; // Standard: ganze Reihe
-    this.winLength = winLength ?? 3; // Standard: ganze Reihe
+    this.winLength = winLength ?? this.size; // Standard: ganze Reihe
     if (
       !Number.isInteger(this.winLength) ||
       this.winLength < 2 ||
