@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { gameToCompactGame as gameToCompactGame } from "@tttweb/shared";
-import type { createGameRoomResponse } from "@tttweb/shared";
+import type { createGameRoomResponse, createGameRequest } from "@tttweb/shared";
 import { gameRoomManager } from "../models/gameRoomManger.ts";
 import { GameState } from "@tttweb/shared";
 import { generateToken } from "../middlewares/authenticator.ts";
@@ -8,8 +8,14 @@ import { AppError } from "../middlewares/errorHandler.ts";
 
 export function makeGameRoom(req: Request, res: Response, next: NextFunction) {
   try {
-    const { size } = req.body;
-    const gameRoomId = gameRoomManager.createGameRoom(size);
+    const { size, winLength } = req.body as createGameRequest;
+    const gameRoomId = gameRoomManager.createGameRoom(
+      size,
+      undefined,
+      undefined,
+      undefined,
+      winLength,
+    );
     const gameRoom = gameRoomManager.getGameRoom(gameRoomId);
     if (!gameRoom) {
       throw new Error(

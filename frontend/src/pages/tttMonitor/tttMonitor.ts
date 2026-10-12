@@ -2,7 +2,12 @@ import "./tttMonitor.css";
 import { renderTicTacToeField } from "../../components/tttField/tttField.ts";
 import type { Page } from "../page.ts";
 import { getMonitorState, mountMonitorPage } from "./apiControllerMointor";
-import { MAX_GAME_SIZE, MIN_GAME_SIZE, DEFAULT_GAME_SIZE } from "./const.ts";
+import {
+  MAX_GAME_SIZE,
+  MIN_GAME_SIZE,
+  DEFAULT_GAME_SIZE,
+  DEFAULT_WIN_LENGTH,
+} from "./const.ts";
 import { escapeHtml } from "@tttweb/shared";
 
 const renderPlayers = (playerList: string | undefined): string => {
@@ -71,6 +76,11 @@ export const tttMonitor: Page = {
           </div>
 
           <div class="monitor-page__info">
+            <span class="monitor-page__label">Win Length</span>
+            <span class="monitor-page__value">${escapeHtml(monitorState.currentWinLength?.toString() ?? "–")}</span>
+          </div>
+
+          <div class="monitor-page__info">
             <span class="monitor-page__label">Aktiver Player</span>
             <span class="monitor-page__value">${escapeHtml(monitorState.activePlayerName || "–")}</span>
           </div>
@@ -87,6 +97,21 @@ export const tttMonitor: Page = {
               value="${DEFAULT_GAME_SIZE.toString()}"
               inputmode="numeric"
               data-game-size
+            />
+          </div>
+
+          <div class="monitor-page__info">
+            <label class="monitor-page__label" for="monitor-win-length">Win Length</label>
+            <input
+              id="monitor-win-length"
+              class="monitor-page__input"
+              type="number"
+              min="2"
+              max="${MAX_GAME_SIZE.toString()}"
+              step="1"
+              value="${DEFAULT_WIN_LENGTH.toString()}"
+              inputmode="numeric"
+              data-win-length
             />
           </div>
 

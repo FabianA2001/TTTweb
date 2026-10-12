@@ -7,5 +7,6 @@ export * from "./gameLogic/player.ts";
 export * from "./APITypes/compactGame.ts";
 export * from "./APITypes/createGameRoomResponse.ts";
 export * from "./APITypes/gameTurnRequest.ts";
+export * from "./APITypes/createGameRequest.ts";
 export * from "./utils/utils.ts";
 export * from "./ipConfig.ts";

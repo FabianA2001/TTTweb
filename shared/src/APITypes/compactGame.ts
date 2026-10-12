@@ -4,6 +4,8 @@ import { Board } from "../gameLogic/board.ts";
 export interface compactGame {
   // The size of the board (e.g., 3 for a 3x3 board)
   size: number;
+  // The win condition length for the current game
+  winLength: number;
   // A flat array representing the board state (0 for empty, 1 for player cross, 2 for player circle)
   board: Array<number>;
   // An array representing which cells are marked (true for marked, false for unmarked)
@@ -28,7 +30,14 @@ export function compactGameToGame(compact: compactGame): Game {
     board.setMark(row, col, compact.markedCells[i]);
   }
 
-  return new Game(compact.size, board, compact.aktivePlayer, compact.status);
+  return new Game(
+    compact.size,
+    board,
+    compact.aktivePlayer,
+    compact.status,
+    undefined,
+    compact.winLength,
+  );
 }
 
 export function gameToCompactGame(game: Game): compactGame {
@@ -47,6 +56,7 @@ export function gameToCompactGame(game: Game): compactGame {
   }
   return {
     size: size,
+    winLength: game.getWinLength(),
     board: board,
     markedCells: markedCells,
     aktivePlayer: game.getCurrentPlayer(),

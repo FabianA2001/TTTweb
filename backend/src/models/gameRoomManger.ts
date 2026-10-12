@@ -12,6 +12,7 @@ class GameRoomManager {
     board?: Board,
     currentPlayer?: number,
     numberOfPlayers?: number,
+    winLength?: number,
   ): string {
     let roomId: string;
     while (true) {
@@ -20,7 +21,13 @@ class GameRoomManager {
         break;
       }
     }
-    const gameRoom = new GameRoom(size, board, currentPlayer, numberOfPlayers);
+    const gameRoom = new GameRoom(
+      size,
+      board,
+      currentPlayer,
+      numberOfPlayers,
+      winLength,
+    );
     this.gameRooms.set(roomId, gameRoom);
     this.addGameChangeListenerToGameWebSockedManger(roomId, gameRoom.getGame());
     this.addPlayerJoinedListenerToGameWebSockedManger(roomId);

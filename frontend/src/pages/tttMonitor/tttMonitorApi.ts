@@ -1,19 +1,27 @@
-import type { compactGame, createGameRoomResponse } from "@tttweb/shared";
+import type {
+  compactGame,
+  createGameRoomResponse,
+  createGameRequest,
+} from "@tttweb/shared";
 import { GAME_ROOM_BASE_URL } from "../../config";
 
 const BASE_URL = GAME_ROOM_BASE_URL;
 
 export async function createGame(
   size: number,
+  winLength: number,
 ): Promise<createGameRoomResponse> {
+  const body: createGameRequest = {
+    size,
+    winLength,
+  };
+
   const response = await fetch(BASE_URL + "/createGameRoom", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      size: size,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {

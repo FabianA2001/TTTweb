@@ -6,6 +6,7 @@ type MonitorViewModel = {
   playerList: string;
   activePlayerName: string;
   currentGameState: string;
+  currentWinLength: number | null;
   showStartButton: boolean;
   board: number[] | null;
   markedCells: boolean[] | null;
@@ -110,6 +111,7 @@ export function getMonitorState(): MonitorViewModel {
     currentGameState: game
       ? formatGameState(game.status)
       : "Noch kein Spiel geladen",
+    currentWinLength: game ? game.winLength : null,
     showStartButton: Boolean(gameId && game?.status === 0),
     board: game?.board ?? null,
     markedCells: game?.markedCells ?? null,

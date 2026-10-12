@@ -31,6 +31,20 @@ function getSelectedGameSize(root: HTMLElement): number {
   return Math.min(parsedSize, MAX_GAME_SIZE);
 }
 
+function getSelectedWinLength(root: HTMLElement, gameSize: number): number {
+  const winLengthInput =
+    root.querySelector<HTMLInputElement>("[data-win-length]");
+  const parsedWinLength = Number.parseInt(
+    winLengthInput?.value ?? MIN_GAME_SIZE.toString(),
+  );
+
+  if (!Number.isInteger(parsedWinLength) || parsedWinLength < 2) {
+    return 2;
+  }
+
+  return Math.min(parsedWinLength, gameSize);
+}
+
 function bindGameModeButtons(root: HTMLElement): void {
   const createGameButton = root.querySelector<HTMLButtonElement>(
     'button[data-game-mode="createGame"]',
@@ -38,7 +52,8 @@ function bindGameModeButtons(root: HTMLElement): void {
 
   createGameButton?.addEventListener("click", async () => {
     const size = getSelectedGameSize(root);
-    const data = await createGame(size);
+    const winLength = getSelectedWinLength(root, size);
+    const data = await createGame(size, winLength);
 
     setCreatorToken(data.creatorToken);
     setGameId(data.gameRoomId);

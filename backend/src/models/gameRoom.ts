@@ -18,6 +18,7 @@ export class GameRoom {
     board?: Board,
     currentPlayer?: number,
     numberOfPlayers?: number,
+    winLength?: number,
   ) {
     this.players = new Map<string, Player>();
     this.creatorId = randomUUID(); // Generate a unique ID for the creator
@@ -27,6 +28,7 @@ export class GameRoom {
       currentPlayer,
       GameState.Preparation,
       numberOfPlayers,
+      winLength,
     );
   }
 
