@@ -10,18 +10,22 @@ import {
 } from "./const.ts";
 import { escapeHtml } from "@tttweb/shared";
 
-const renderPlayers = (playerList: string | undefined): string => {
-  const players = (playerList ?? "")
-    .split(",")
-    .map((name) => name.trim())
-    .filter(Boolean);
-
-  if (players.length === 0) {
+const renderPlayers = (
+  playerList: Array<{ name: string; symbol: number; color: string }>,
+): string => {
+  if (playerList.length === 0) {
     return `<li class="monitor-page__player monitor-page__player--empty">Keine Teilnehmer</li>`;
   }
 
-  return players
-    .map((name) => `<li class="monitor-page__player">${escapeHtml(name)}</li>`)
+  return playerList
+    .map(
+      (player) => `
+        <li class="monitor-page__player" style="--player-color: ${player.color};">
+          <span class="monitor-page__player-color" aria-hidden="true"></span>
+          <span class="monitor-page__player-name">${escapeHtml(player.name)}</span>
+        </li>
+      `,
+    )
     .join("");
 };
 

@@ -1,9 +1,13 @@
 import type { compactGame, Player, GameState } from "@tttweb/shared";
-import { numberToSymbole } from "@tttweb/shared";
+import { getPlayerColor } from "../../utils/playerColors.ts";
 
 type MonitorViewModel = {
   gameId: string | null;
-  playerList: string;
+  playerList: Array<{
+    name: string;
+    symbol: number;
+    color: string;
+  }>;
   activePlayerName: string;
   currentGameState: string;
   currentWinLength: number | null;
@@ -93,14 +97,11 @@ export function setMonitorGameStatus(status: GameState): void {
 
 export function getMonitorState(): MonitorViewModel {
   const joinedPlayers = Array.from(players.values());
-  const playerList =
-    joinedPlayers.length > 0
-      ? joinedPlayers
-          .map(
-            (player) => `• ${player.name} (${numberToSymbole(player.symbol)})`,
-          )
-          .join("<br>")
-      : "Keine Spieler beigetreten";
+  const playerList = joinedPlayers.map((player) => ({
+    name: player.name,
+    symbol: player.symbol,
+    color: getPlayerColor(player.symbol),
+  }));
 
   return {
     gameId,

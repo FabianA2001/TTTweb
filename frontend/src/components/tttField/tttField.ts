@@ -1,5 +1,6 @@
 import "./tttField.css";
-import { numberToSymbole, indexToPosition } from "@tttweb/shared";
+import { indexToPosition } from "@tttweb/shared";
+import { getPlayerColor } from "../../utils/playerColors.ts";
 
 export function renderTicTacToeField(
   cells: number[],
@@ -25,7 +26,7 @@ export function renderTicTacToeField(
       ${cells
         .map((cell, index) => {
           const [row, column] = indexToPosition(index + 1, size);
-          const value = numberToSymbole(cell);
+          const hasValue = cell !== 0;
           const marked = markedCells[index] ?? false;
           const fieldNumber = index + 1;
 
@@ -35,14 +36,18 @@ export function renderTicTacToeField(
               class="ttt-field__cell${marked ? " ttt-field__cell--marked" : ""}"
               data-cell-index="${index}"
               data-marked="${marked}"
-              aria-label="Row ${row + 1}, Column ${column + 1}${value ? `, ${value}` : ", empty"}${marked ? ", marked" : ""}"
+              aria-label="Row ${row + 1}, Column ${column + 1}${hasValue ? `, player ${cell}` : ", empty"}${marked ? ", marked" : ""}"
             >
               ${
-                showFieldNumbers && !value
+                showFieldNumbers && !hasValue
                   ? `<span class="ttt-field__number">${fieldNumber}</span>`
                   : ""
               }
-              ${value}
+              ${
+                hasValue
+                  ? `<span class="ttt-field__token" style="--token-color: ${getPlayerColor(cell)};"></span>`
+                  : ""
+              }
             </button>
           `;
         })
