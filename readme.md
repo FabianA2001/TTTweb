@@ -86,10 +86,14 @@ npm run dev:frontend
 npm run dev:backend
 ```
 
-Wichtig: In `frontend/src/config.ts` muss die Backend-Adresse in `SERVER_HOST` eingetragen werden, damit die API- und WebSocket-Anfragen an die richtige IP/URL gehen. Beispiel:
+**Wichtig:** In `shared/src/ipConfig.ts` muss die IP-Adresse des Backends/Frontends in `IP` eingetragen werden, damit die API- und WebSocket-Anfragen an die richtige Adresse gehen. Beispiel:
 
 ```ts
-export const SERVER_HOST = "192.168.1.109:3000";
+export const IP = "192.168.11.34";
+// export const IP = "localhost:3000";
+
+export const SERVER_PORT = "3000";
+export const FRONTEND_PORT = "5173";
 ```
 
-Wenn das Backend lokal läuft, kann auch `localhost:3000` verwendet werden. Das Backend läuft standardmäßig auf Port `3000`. Das Frontend wird von Vite bereitgestellt und zeigt die lokale Entwicklungs-URL im Terminal an.
+Wenn das Backend lokal läuft, kann stattdessen `localhost` als Adresse verwendet werden. Das Backend läuft standardmäßig auf Port `3000` (`SERVER_PORT`), das Frontend wird von Vite auf Port `5173` (`FRONTEND_PORT`) bereitgestellt. Die genaue lokale Entwicklungs-URL wird zusätzlich im Terminal angezeigt.
