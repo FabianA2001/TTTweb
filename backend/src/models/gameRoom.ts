@@ -1,15 +1,13 @@
 import type { Player } from "@tttweb/shared";
 import { randomUUID } from "crypto";
-import { gameStore } from "./GameStore.ts";
 import type { Board } from "@tttweb/shared";
-import { GameState } from "@tttweb/shared";
-import type { Game } from "@tttweb/shared";
+import { Game, GameState } from "@tttweb/shared";
 import { AppError } from "../middlewares/errorHandler.ts";
 
 export type PlayerJoinedListener = (player: Player) => void;
 
 export class GameRoom {
-  private gameId: string;
+  private game: Game;
   private players: Map<string, Player>;
   private currentSymbol: number = 1; // Start with symbol 1 for the first player
   private creatorId: string | null = null;
@@ -22,14 +20,14 @@ export class GameRoom {
     numberOfPlayers?: number,
   ) {
     this.players = new Map<string, Player>();
-    this.gameId = gameStore.createGame(
+    this.creatorId = randomUUID(); // Generate a unique ID for the creator
+    this.game = new Game(
       size,
       board,
       currentPlayer,
       GameState.Preparation,
       numberOfPlayers,
     );
-    this.creatorId = randomUUID(); // Generate a unique ID for the creator
   }
 
   subscribe(listener: PlayerJoinedListener): () => void {
@@ -41,22 +39,12 @@ export class GameRoom {
     };
   }
 
-  getGameId(): string {
-    return this.gameId;
+  getGame(): Game {
+    return this.game;
   }
 
   getCreatorId(): string | null {
     return this.creatorId;
-  }
-
-  getGame(): Game {
-    const game = gameStore.getGame(this.gameId);
-    if (!game) {
-      const err = new AppError("Spiel wurde nicht gefunden");
-      err.status = 409;
-      throw err;
-    }
-    return game;
   }
 
   getPlayers(): Map<string, Player> {
@@ -64,19 +52,17 @@ export class GameRoom {
   }
 
   startGame(): void {
-    const game = gameStore.getGame(this.gameId);
-    if (!game) {
+    if (!this.game) {
       const err = new AppError("Spiel wurde nicht gefunden");
       err.status = 409;
       throw err;
     }
-    game.setNumberOfPlayers(this.players.size);
-    game.startGame();
+    this.game.setNumberOfPlayers(this.players.size);
+    this.game.startGame();
   }
 
   gameTurn(row: number, column: number, playerId: string): void {
-    const game = gameStore.getGame(this.gameId);
-    if (!game) {
+    if (!this.game) {
       const err = new AppError("Spiel wurde nicht gefunden");
       err.status = 409;
       throw err;
@@ -89,13 +75,13 @@ export class GameRoom {
       throw err;
     }
 
-    if (game.getCurrentPlayer() !== player.symbol) {
+    if (this.game.getCurrentPlayer() !== player.symbol) {
       const err = new AppError("Ein anderer Spieler ist am Zug");
       err.status = 409;
       throw err;
     }
 
-    game.gameturn(row, column);
+    this.game.gameturn(row, column);
   }
 
   addPlayerToRoom(playerName: string): string {

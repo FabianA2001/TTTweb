@@ -1,4 +1,3 @@
-import { gameStore } from "./GameStore.ts";
 import { Game } from "@tttweb/shared";
 import { GameRoom } from "./gameRoom.ts";
 import type { Board } from "@tttweb/shared";
@@ -60,7 +59,6 @@ class GameRoomManager {
     if (!gameRoom) {
       return false;
     }
-    gameStore.deleteGame(gameRoom.getGameId());
     return this.gameRooms.delete(roomId);
   }
 }
