@@ -16,6 +16,7 @@ export class Game {
   private currentPlayer: number;
   private gameState: GameState;
   private size: number;
+  private winLength: number;
   private listeners = new Set<GameChangeListener>();
   private winner: number | null = null;
   private numberOfPlayers: number;
@@ -26,9 +27,21 @@ export class Game {
     currentPlayer?: number,
     gameState?: GameState,
     numberOfPlayers?: number,
+    winLength?: number,
   ) {
     this.size = size ?? 3;
-    this.board = board ?? new Board(size ?? 3);
+    // this.winLength = winLength ?? this.size; // Standard: ganze Reihe
+    this.winLength = winLength ?? 3; // Standard: ganze Reihe
+    if (
+      !Number.isInteger(this.winLength) ||
+      this.winLength < 2 ||
+      this.winLength > this.size
+    ) {
+      throw new Error(
+        `winLength muss eine ganze Zahl zwischen 2 und ${this.size} sein (war ${this.winLength})`,
+      );
+    }
+    this.board = board ?? new Board(this.size);
     this.currentPlayer = currentPlayer ?? 1;
     this.gameState = gameState ?? GameState.InProgress;
     this.numberOfPlayers = numberOfPlayers ?? 2;
@@ -52,8 +65,13 @@ export class Game {
   getBoard(): Board {
     return this.board;
   }
+
   getSize(): number {
     return this.size;
+  }
+
+  getWinLength(): number {
+    return this.winLength;
   }
 
   getCurrentPlayer(): number {
@@ -63,9 +81,11 @@ export class Game {
   getGameState(): GameState {
     return this.gameState;
   }
+
   getWinner(): number | null {
     return this.winner;
   }
+
   getNumberOfPlayers(): number {
     return this.numberOfPlayers;
   }
@@ -78,6 +98,7 @@ export class Game {
     }
     this.numberOfPlayers = numberOfPlayers;
   }
+
   startGame(): void {
     if (this.gameState !== GameState.Preparation) {
       throw new Error("Game is already in progress or finished");
@@ -97,11 +118,14 @@ export class Game {
       (err as Error & { status?: number }).status = 409;
       throw err;
     }
-    if (this.checkDraw()) {
-      this.gameState = GameState.Draw;
-      return GameState.Draw;
-    }
+
+    // Erst den Gewinner prüfen, dann das Unentschieden:
+    // Ein Gewinnzug auf dem vollen Brett ist ein Sieg, kein Draw.
     this.gameState = this.checkWinnerAndMark();
+    if (this.gameState === GameState.InProgress && this.checkDraw()) {
+      this.gameState = GameState.Draw;
+    }
+
     this.notifyChange();
     return this.gameState;
   }
@@ -121,7 +145,7 @@ export class Game {
   }
 
   private checkWinnerAndMark(): GameState {
-    const winner = this.board.getWinner();
+    const winner = this.board.getWinner(this.winLength);
 
     for (let row = 0; row < this.board.getSize(); row++) {
       for (let column = 0; column < this.board.getSize(); column++) {

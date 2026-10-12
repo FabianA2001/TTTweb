@@ -26,59 +26,58 @@ export class Board {
     return [...this.cells];
   }
 
-  getWinner(): WinnerInfo | null {
-    const size = this.size;
+  getWinner(winLength: number = this.size): WinnerInfo | null {
+    if (
+      !Number.isInteger(winLength) ||
+      winLength < 2 ||
+      winLength > this.size
+    ) {
+      throw new Error(
+        `winLength must be an integer between 2 and ${this.size}.`,
+      );
+    }
+
     const EMPTY = 0;
 
-    const checkLine = (values: number[]): number | null => {
-      const first = values[0];
-      if (first === EMPTY) {
-        return null;
+    // Richtungen: rechts, runter, diagonal runter-rechts, diagonal runter-links
+    const directions: Array<[number, number]> = [
+      [0, 1],
+      [1, 0],
+      [1, 1],
+      [1, -1],
+    ];
+
+    for (let row = 0; row < this.size; row++) {
+      for (let column = 0; column < this.size; column++) {
+        const player = this.getCell(row, column);
+        if (player === EMPTY) continue;
+
+        for (const [dRow, dColumn] of directions) {
+          // Endpunkt der Reihe vorab prüfen, spart unnötige Schritte
+          const endRow = row + dRow * (winLength - 1);
+          const endColumn = column + dColumn * (winLength - 1);
+          if (
+            endRow < 0 ||
+            endRow >= this.size ||
+            endColumn < 0 ||
+            endColumn >= this.size
+          ) {
+            continue;
+          }
+
+          const cells: Array<[number, number]> = [];
+          for (let i = 0; i < winLength; i++) {
+            const r = row + dRow * i;
+            const c = column + dColumn * i;
+            if (this.getCell(r, c) !== player) break;
+            cells.push([r, c]);
+          }
+
+          if (cells.length === winLength) {
+            return { winner: player, cells };
+          }
+        }
       }
-      return values.every((cell) => cell === first) ? first : null;
-    };
-
-    for (let row = 0; row < size; row++) {
-      const winner = checkLine(this.getRow(row));
-      if (winner !== null) {
-        return {
-          winner,
-          cells: Array.from({ length: size }, (_, column) => [row, column]),
-        };
-      }
-    }
-
-    for (let column = 0; column < size; column++) {
-      const winner = checkLine(this.getColumn(column));
-      if (winner !== null) {
-        return {
-          winner,
-          cells: Array.from({ length: size }, (_, row) => [row, column]),
-        };
-      }
-    }
-
-    const firstDiagonal = Array.from(
-      { length: size },
-      (_, index) => [index, index] as [number, number],
-    );
-    const secondDiagonal = Array.from(
-      { length: size },
-      (_, index) => [index, size - 1 - index] as [number, number],
-    );
-
-    const firstDiagonalWinner = checkLine(
-      firstDiagonal.map(([row, column]) => this.getCell(row, column)),
-    );
-    if (firstDiagonalWinner !== null) {
-      return { winner: firstDiagonalWinner, cells: firstDiagonal };
-    }
-
-    const secondDiagonalWinner = checkLine(
-      secondDiagonal.map(([row, column]) => this.getCell(row, column)),
-    );
-    if (secondDiagonalWinner !== null) {
-      return { winner: secondDiagonalWinner, cells: secondDiagonal };
     }
 
     return null;
