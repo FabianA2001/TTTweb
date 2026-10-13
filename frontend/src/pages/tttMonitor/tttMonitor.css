@@ -120,6 +120,16 @@
   word-break: break-word;
 }
 
+.monitor-page__player--active {
+  border-color: color-mix(in srgb, var(--player-color) 65%, #dbeafe);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--player-color) 12%, #ffffff) 0%,
+    #f8fbff 100%
+  );
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--player-color) 18%, transparent);
+}
+
 .monitor-page__player-color {
   flex: 0 0 auto;
   width: 0.8rem;
@@ -132,6 +142,18 @@
 .monitor-page__player-name {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.monitor-page__player-status {
+  flex: 0 0 auto;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--player-color) 16%, white);
+  color: var(--player-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .monitor-page__player-symbol {

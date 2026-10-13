@@ -12,20 +12,28 @@ import { escapeHtml } from "@tttweb/shared";
 
 const renderPlayers = (
   playerList: Array<{ name: string; symbol: number; color: string }>,
+  activePlayerName: string,
 ): string => {
   if (playerList.length === 0) {
     return `<li class="monitor-page__player monitor-page__player--empty">Keine Teilnehmer</li>`;
   }
 
   return playerList
-    .map(
-      (player) => `
-        <li class="monitor-page__player" style="--player-color: ${player.color};">
+    .map((player) => {
+      const isActive = player.name === activePlayerName;
+
+      return `
+        <li
+          class="monitor-page__player${isActive ? " monitor-page__player--active" : ""}"
+          style="--player-color: ${player.color};"
+          ${isActive ? 'data-player-active="true"' : ""}
+        >
           <span class="monitor-page__player-color" aria-hidden="true"></span>
           <span class="monitor-page__player-name">${escapeHtml(player.name)}</span>
+          ${isActive ? '<span class="monitor-page__player-status" aria-label="Aktiver Spieler">Aktiv</span>' : ""}
         </li>
-      `,
-    )
+      `;
+    })
     .join("");
 };
 
@@ -85,11 +93,6 @@ export const tttMonitor: Page = {
           </div>
 
           <div class="monitor-page__info">
-            <span class="monitor-page__label">Aktiver Player</span>
-            <span class="monitor-page__value">${escapeHtml(monitorState.activePlayerName || "–")}</span>
-          </div>
-
-          <div class="monitor-page__info">
             <label class="monitor-page__label" for="monitor-game-size">Boardgröße</label>
             <input
               id="monitor-game-size"
@@ -142,7 +145,7 @@ export const tttMonitor: Page = {
           <h2 class="monitor-page__panel-title">Aktive Player</h2>
 
           <ul class="monitor-page__players">
-            ${renderPlayers(monitorState.playerList)}
+            ${renderPlayers(monitorState.playerList, monitorState.activePlayerName)}
           </ul>
         </section>
       </div>
