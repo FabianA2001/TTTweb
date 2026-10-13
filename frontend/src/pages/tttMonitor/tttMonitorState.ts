@@ -16,6 +16,7 @@ type MonitorViewModel = {
   showStartButton: boolean;
   board: number[] | null;
   markedCells: boolean[] | null;
+  lastChangedCell: number | null;
 };
 
 let refreshPage: (() => void) | null = null;
@@ -23,6 +24,7 @@ let game: compactGame | null = null;
 let gameId: string | null = null;
 let creatorToken: string | null = null;
 let players: Map<number, Player> = new Map();
+let lastChangedCell: number | null = null;
 
 type PersistedMonitorState = {
   game: compactGame | null;
@@ -142,8 +144,41 @@ export function monitorRefresh(): void {
   refreshPage();
 }
 
+// possible not best solution, but works for now
+function computeLastChangedCell(
+  previousBoard: number[] | null | undefined,
+  nextBoard: number[] | null | undefined,
+): number | null {
+  if (!nextBoard || nextBoard.length === 0) {
+    return null;
+  }
+
+  if (!previousBoard || previousBoard.length !== nextBoard.length) {
+    const fallbackIndex = nextBoard.reduce(
+      (lastIndex, cell, index) => (cell !== 0 ? index : lastIndex),
+      -1,
+    );
+    return fallbackIndex >= 0 ? fallbackIndex : null;
+  }
+
+  let newestChange: number | null = null;
+
+  for (let index = 0; index < nextBoard.length; index++) {
+    if (nextBoard[index] !== previousBoard[index]) {
+      newestChange = index;
+    }
+  }
+
+  return newestChange;
+}
+
 export function setMonitorGame(nextGame: compactGame | null): void {
+  const previousBoard = game?.board ?? null;
   game = nextGame;
+  lastChangedCell = computeLastChangedCell(
+    previousBoard,
+    nextGame?.board ?? null,
+  );
   setPersistMonitorState();
 }
 
@@ -152,6 +187,11 @@ export function getMonitorGame(): compactGame | null {
 }
 
 export function setGameId(nextGameId: string | null): void {
+  if (nextGameId !== null && nextGameId !== gameId) {
+    game = null;
+    lastChangedCell = null;
+  }
+
   gameId = nextGameId;
   setPersistMonitorState();
 }
@@ -208,5 +248,6 @@ export function getMonitorState(): MonitorViewModel {
     showStartButton: Boolean(gameId && game?.status === 0),
     board: game?.board ?? null,
     markedCells: game?.markedCells ?? null,
+    lastChangedCell,
   };
 }

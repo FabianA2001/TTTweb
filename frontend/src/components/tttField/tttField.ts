@@ -6,6 +6,7 @@ export function renderTicTacToeField(
   cells: number[],
   markedCells: boolean[] | null = [],
   showFieldNumbers = false,
+  lastChangedCell: number | null = null,
 ): string {
   if (markedCells === null) {
     markedCells = [];
@@ -27,16 +28,17 @@ export function renderTicTacToeField(
         .map((cell, index) => {
           const [row, column] = indexToPosition(index + 1, size);
           const hasValue = cell !== 0;
-          const marked = markedCells[index] ?? false;
+          const isLastChanged = lastChangedCell === index;
+          const marked = (markedCells[index] ?? false) || isLastChanged;
           const fieldNumber = index + 1;
 
           return `
             <button
               type="button"
-              class="ttt-field__cell${marked ? " ttt-field__cell--marked" : ""}"
+              class="ttt-field__cell${marked ? " ttt-field__cell--marked" : ""}${isLastChanged ? " ttt-field__cell--last-change" : ""}"
               data-cell-index="${index}"
               data-marked="${marked}"
-              aria-label="Row ${row + 1}, Column ${column + 1}${hasValue ? `, player ${cell}` : ", empty"}${marked ? ", marked" : ""}"
+              aria-label="Row ${row + 1}, Column ${column + 1}${hasValue ? `, player ${cell}` : ", empty"}${marked ? ", marked" : ""}${isLastChanged ? ", letzte Änderung" : ""}"
             >
               ${
                 showFieldNumbers && !hasValue
@@ -59,17 +61,32 @@ export function renderTicTacToeField(
 export function createBoardCellArray(board: {
   getBoard: () => number[];
   getMarks: () => boolean[];
-}): { cells: number[]; markedCells: boolean[] } {
+  getLastChanged?: () => number | null;
+}): {
+  cells: number[];
+  markedCells: boolean[];
+  lastChangedCell: number | null;
+} {
   return {
     cells: board.getBoard(),
     markedCells: board.getMarks(),
+    lastChangedCell: board.getLastChanged ? board.getLastChanged() : null,
   };
 }
 
 export function renderTicTacToeFieldFromBoard(
-  board: { getBoard: () => number[]; getMarks: () => boolean[] },
+  board: {
+    getBoard: () => number[];
+    getMarks: () => boolean[];
+    getLastChanged?: () => number | null;
+  },
   showFieldNumbers = false,
 ): string {
-  const { cells, markedCells } = createBoardCellArray(board);
-  return renderTicTacToeField(cells, markedCells, showFieldNumbers);
+  const { cells, markedCells, lastChangedCell } = createBoardCellArray(board);
+  return renderTicTacToeField(
+    cells,
+    markedCells,
+    showFieldNumbers,
+    lastChangedCell,
+  );
 }

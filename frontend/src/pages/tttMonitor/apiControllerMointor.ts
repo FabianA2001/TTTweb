@@ -78,6 +78,7 @@ function bindGameModeButtons(root: HTMLElement): void {
 
     setCreatorToken(data.creatorToken);
     setGameId(data.gameRoomId);
+    setMonitorGame(null);
     clearMonitorPlayers();
 
     console.log("Game created with ID:", data.gameRoomId);

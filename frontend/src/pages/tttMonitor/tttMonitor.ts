@@ -139,7 +139,7 @@ export const tttMonitor: Page = {
           </div>
         </section>
 
-        <div class="monitor-page__board">${monitorState.board ? renderTicTacToeField(monitorState.board, monitorState.markedCells, true) : ""}</div>
+        <div class="monitor-page__board">${monitorState.board ? renderTicTacToeField(monitorState.board, monitorState.markedCells, true, monitorState.lastChangedCell) : ""}</div>
 
         <section class="monitor-page__panel monitor-page__panel--players" aria-label="Spieler">
           <h2 class="monitor-page__panel-title">Aktive Player</h2>
