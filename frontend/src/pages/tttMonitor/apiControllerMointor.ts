@@ -45,12 +45,33 @@ function getSelectedWinLength(root: HTMLElement, gameSize: number): number {
   return Math.min(parsedWinLength, gameSize);
 }
 
+async function currentGameExists(gameId: string): Promise<boolean> {
+  try {
+    await getGameState(gameId);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function bindGameModeButtons(root: HTMLElement): void {
   const createGameButton = root.querySelector<HTMLButtonElement>(
     'button[data-game-mode="createGame"]',
   );
 
   createGameButton?.addEventListener("click", async () => {
+    const currentGameId = getGameId();
+
+    if (currentGameId && (await currentGameExists(currentGameId))) {
+      if (
+        !window.confirm(
+          "Das aktuelle Spiel wird durch ein neues ersetzt. Fortfahren?",
+        )
+      ) {
+        return;
+      }
+    }
+
     const size = getSelectedGameSize(root);
     const winLength = getSelectedWinLength(root, size);
     const data = await createGame(size, winLength);
@@ -95,6 +116,13 @@ function bindGameModeButtons(root: HTMLElement): void {
 export function mountMonitorPage(root: HTMLElement, refresh: () => void): void {
   setMonitorRefresh(refresh);
   mountMonitorWebSocket();
+
+  const currentGameId = getGameId();
+
+  if (currentGameId) {
+    void subscribeToSocket(currentGameId);
+  }
+
   bindGameModeButtons(root);
 }
 

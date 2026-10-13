@@ -8,6 +8,7 @@ import {
 
 let mounted = false;
 let socket: WebSocket | null = null;
+let subscribedGameId: string | null = null;
 
 function handleSocketMessage(event: MessageEvent<string>): void {
   console.log("Received message from WebSocket:", event.data);
@@ -40,12 +41,23 @@ export function mountMonitorWebSocket(): void {
 
   socket.addEventListener("open", () => {
     console.log("Connected to gameWebSocket server");
+
+    if (subscribedGameId) {
+      socket?.send(
+        JSON.stringify({
+          type: "subscribe",
+          gameId: subscribedGameId,
+        }),
+      );
+    }
   });
 
   socket.addEventListener("message", handleSocketMessage);
 }
 
 export async function subscribeToSocket(id: string): Promise<void> {
+  subscribedGameId = id;
+
   if (!socket) {
     throw new Error("WebSocket ist nicht verbunden");
   }
