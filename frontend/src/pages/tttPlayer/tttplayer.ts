@@ -3,6 +3,15 @@ import { indexToPosition } from "@tttweb/shared";
 import type { Page } from "../page.ts";
 import "./tttPlayer.css";
 
+const STORAGE_KEY = "tttPlayerSession";
+
+type StoredSession = {
+  gameId: string;
+  playerToken: string;
+  playerName: string;
+  gameSize: number;
+};
+
 let refreshPage: (() => void) | null = null;
 
 let gameId: string | null = null;
@@ -12,6 +21,97 @@ let gameSize: number | null = null;
 
 let errorMessage: string | null = null;
 let successMessage: string | null = null;
+
+// Gespeicherten Zustand laden (wird einmal beim Laden des Moduls ausgeführt)
+function loadSession(): void {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+
+    const data = JSON.parse(raw) as Partial<StoredSession>;
+
+    if (
+      typeof data.gameId === "string" &&
+      typeof data.playerToken === "string" &&
+      typeof data.playerName === "string" &&
+      typeof data.gameSize === "number" &&
+      Number.isInteger(data.gameSize) &&
+      data.gameSize > 0
+    ) {
+      gameId = data.gameId;
+      playerToken = data.playerToken;
+      playerName = data.playerName;
+      gameSize = data.gameSize;
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {
+    // Kaputte oder nicht lesbare Daten verwerfen
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* localStorage nicht verfügbar */
+    }
+  }
+}
+
+function saveSession(): void {
+  if (!gameId || !playerToken || !playerName || !gameSize) return;
+
+  const session: StoredSession = { gameId, playerToken, playerName, gameSize };
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  } catch {
+    // z. B. privater Modus oder Speicher voll: App läuft trotzdem weiter
+    console.warn("Session konnte nicht gespeichert werden.");
+  }
+}
+
+function clearSession(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* localStorage nicht verfügbar */
+    console.warn("Session konnte nicht gelöscht werden.");
+  }
+}
+
+function resetState(): void {
+  gameId = null;
+  playerToken = null;
+  playerName = null;
+  gameSize = null;
+  clearSession();
+}
+
+loadSession();
+
+// Wenn ein Zustand geladen wurde, muss er erst gegen den Server geprüft werden
+let isCheckingSession = gameId !== null;
+let sessionChecked = false;
+
+// Prüft einmalig, ob das gespeicherte Spiel auf dem Server noch existiert
+async function validateStoredSession(): Promise<void> {
+  const storedGameId = gameId;
+  if (sessionChecked || !storedGameId) return;
+
+  sessionChecked = true;
+
+  try {
+    // Existiert das Spiel nicht mehr, wirft der Aufruf einen Fehler
+    gameSize = await getSizeOfGame(storedGameId);
+    saveSession();
+  } catch {
+    resetState();
+    errorMessage =
+      "Das gespeicherte Spiel existiert nicht mehr. Bitte tritt einem neuen Spiel bei.";
+  } finally {
+    isCheckingSession = false;
+  }
+
+  refreshPage?.();
+}
 
 // Schutz davor, dass Eingaben oder Fehlertexte als HTML interpretiert werden
 function escapeHtml(value: string): string {
@@ -55,17 +155,20 @@ function bindJoinGameButton(root: HTMLElement): void {
     successMessage = null;
 
     try {
-      playerToken = await joinGame(enteredGameId, name);
+      const token = await joinGame(enteredGameId, name);
+      const size = await getSizeOfGame(enteredGameId);
+
       gameId = enteredGameId;
+      playerToken = token;
       playerName = name;
-      gameSize = await getSizeOfGame(enteredGameId);
+      gameSize = size;
+
+      saveSession();
+      sessionChecked = true;
 
       successMessage = "Du bist dem Spiel beigetreten.";
     } catch (error) {
-      gameId = null;
-      playerToken = null;
-      playerName = null;
-      gameSize = null;
+      resetState();
 
       errorMessage =
         error instanceof Error
@@ -127,6 +230,25 @@ function bindTurnButton(root: HTMLElement): void {
   });
 }
 
+function bindLeaveButton(root: HTMLElement): void {
+  const leaveButton = root.querySelector<HTMLButtonElement>(
+    'button[data-action="leaveGame"]',
+  );
+
+  leaveButton?.addEventListener("click", () => {
+    const confirmed = window.confirm(
+      "Möchtest du das Spiel wirklich verlassen? Dein gespeicherter Spielzustand geht dabei verloren.",
+    );
+
+    if (!confirmed) return;
+
+    resetState();
+    errorMessage = null;
+    successMessage = null;
+    refreshPage?.();
+  });
+}
+
 export const tttPlayer: Page = {
   render: () => {
     return `
@@ -137,73 +259,79 @@ export const tttPlayer: Page = {
 
         <div class="ttt-player-card">
           ${
-            !gameId
-              ? `
-                <div class="ttt-player-form">
-                  <h2>Spiel beitreten</h2>
+            isCheckingSession
+              ? `<p class="ttt-player-hint" role="status">Gespeichertes Spiel wird geprüft…</p>`
+              : !gameId
+                ? `
+                  <div class="ttt-player-form">
+                    <h2>Spiel beitreten</h2>
 
-                  <label class="ttt-player-field">
-                    <span class="ttt-player-field-label">Game-ID</span>
-                    <input
-                      class="ttt-player-input"
-                      type="text"
-                      name="gameId"
-                      placeholder="Game-ID eingeben"
-                      autocomplete="off"
-                    />
-                  </label>
+                    <label class="ttt-player-field">
+                      <span class="ttt-player-field-label">Game-ID</span>
+                      <input
+                        class="ttt-player-input"
+                        type="text"
+                        name="gameId"
+                        placeholder="Game-ID eingeben"
+                        autocomplete="off"
+                      />
+                    </label>
 
-                  <label class="ttt-player-field">
-                    <span class="ttt-player-field-label">Name</span>
-                    <input
-                      class="ttt-player-input"
-                      type="text"
-                      name="name"
-                      placeholder="Name eingeben"
-                      autocomplete="nickname"
-                    />
-                  </label>
+                    <label class="ttt-player-field">
+                      <span class="ttt-player-field-label">Name</span>
+                      <input
+                        class="ttt-player-input"
+                        type="text"
+                        name="name"
+                        placeholder="Name eingeben"
+                        autocomplete="nickname"
+                      />
+                    </label>
 
-                  <button type="button" data-game-mode="joinGame">
-                    Spiel beitreten
-                  </button>
-                </div>
-              `
-              : `
-                <div class="ttt-player-game-id">
-                  <div class="ttt-player-game-id-row">
-                    <span class="ttt-player-game-id-label">Spieler</span>
-                    <span class="ttt-player-name-value">${escapeHtml(playerName ?? "")}</span>
+                    <button type="button" data-game-mode="joinGame">
+                      Spiel beitreten
+                    </button>
                   </div>
-                  <div class="ttt-player-game-id-row">
-                    <span class="ttt-player-game-id-label">Game-ID</span>
-                    <span class="ttt-player-game-id-value">${escapeHtml(gameId)}</span>
+                `
+                : `
+                  <div class="ttt-player-game-id">
+                    <div class="ttt-player-game-id-row">
+                      <span class="ttt-player-game-id-label">Spieler</span>
+                      <span class="ttt-player-name-value">${escapeHtml(playerName ?? "")}</span>
+                    </div>
+                    <div class="ttt-player-game-id-row">
+                      <span class="ttt-player-game-id-label">Game-ID</span>
+                      <span class="ttt-player-game-id-value">${escapeHtml(gameId)}</span>
+                    </div>
                   </div>
-                </div>
 
-                <div class="ttt-player-form">
-                  <h2>Spielzug machen</h2>
+                  <div class="ttt-player-form">
+                    <h2>Spielzug machen</h2>
 
-                  <label class="ttt-player-field">
-                    <span class="ttt-player-field-label">Feldnummer</span>
-                    <input
-                      class="ttt-player-input ttt-player-input--number"
-                      type="number"
-                      name="fieldNumber"
-                      min="1"
-                      max="${gameSize! * gameSize!}"
-                      placeholder="1"
-                      inputmode="numeric"
-                    />
-                  </label>
+                    <label class="ttt-player-field">
+                      <span class="ttt-player-field-label">Feldnummer</span>
+                      <input
+                        class="ttt-player-input ttt-player-input--number"
+                        type="number"
+                        name="fieldNumber"
+                        min="1"
+                        max="${gameSize! * gameSize!}"
+                        placeholder="1"
+                        inputmode="numeric"
+                      />
+                    </label>
 
-                  <p class="ttt-player-hint">Felder von 1 bis ${gameSize! * gameSize!}</p>
+                    <p class="ttt-player-hint">Felder von 1 bis ${gameSize! * gameSize!}</p>
 
-                  <button type="button" data-action="makeTurn">
-                    Spielzug machen
-                  </button>
-                </div>
-              `
+                    <button type="button" data-action="makeTurn">
+                      Spielzug machen
+                    </button>
+
+                    <button type="button" data-action="leaveGame">
+                      Spiel verlassen
+                    </button>
+                  </div>
+                `
           }
 
           ${
@@ -227,5 +355,8 @@ export const tttPlayer: Page = {
 
     bindJoinGameButton(root);
     bindTurnButton(root);
+    bindLeaveButton(root);
+
+    void validateStoredSession();
   },
 };
